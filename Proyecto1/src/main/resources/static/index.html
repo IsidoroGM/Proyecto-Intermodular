@@ -56,6 +56,10 @@
             <input type="number" id="herirX" value="4" min="2" max="6">
         </div>
         <div>
+            <label>¿6s al herir saltan armadura?</label>
+            <input type="checkbox" id="seisHeridaInsalvable" style="width: auto;">
+        </div>
+        <div>
             <label>Salvación (X+):</label>
             <input type="number" id="salvacionX" value="5" min="2" max="7">
         </div>
@@ -79,6 +83,7 @@
             repeticionImpacto: document.getElementById('repeticionImpacto').value,
             especialSeisImpacto: document.getElementById('especialSeisImpacto').value,
             herirX: parseInt(document.getElementById('herirX').value),
+            seisHeridaInsalvable: document.getElementById('seisHeridaInsalvable').checked, // Recoge true o false
             repeticionHerir: "NONE", // Simplificado por ahora
             seisHeridaInsalvable: false,
             salvacionX: parseInt(document.getElementById('salvacionX').value),

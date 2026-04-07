@@ -52,4 +52,6 @@ public class AtaqueRequest {
 
     public int getNoHayDolorX() { return noHayDolorX; }
     public void setNoHayDolorX(int noHayDolorX) { this.noHayDolorX = noHayDolorX; }
+
+    
 }

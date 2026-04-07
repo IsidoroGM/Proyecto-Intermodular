@@ -41,13 +41,13 @@ public class SimuladorService {
         for (int i = 0; i < impactos; i++) {
             int resultado = tirarD6(req.getRepeticionHerir(), req.getHerirX());
             
-            if (resultado >= req.getHerirX()) {
-                // Si es un 6 y la regla de "insalvable" está activa
-                if (resultado == 6 && req.isSeisHeridaInsalvable()) {
-                    heridasTrasSalvacion++; // Pasa directo al daño final (salta paso 3)
-                } else {
-                    heridasEfectivas++;
-                }
+            // Si saca un 6 Y la opción está marcada en la web
+            if (resultado == 6 && req.isSeisHeridaInsalvable()) {
+                heridasTrasSalvacion++; // Salta directo al pool de daño (ignora armadura)
+            } 
+            // Si saca un éxito normal (o un 6 pero la opción está desactivada)
+            else if (resultado >= req.getHerirX()) {
+                heridasEfectivas++; // Estas pasan por la fase de salvación de armadura
             }
         }
 
