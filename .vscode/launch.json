@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-Proyecto1Application<Proyecto1>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "proyecto.IM.warMetrics.Proyecto1.Proyecto1Application",
+            "projectName": "Proyecto1",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

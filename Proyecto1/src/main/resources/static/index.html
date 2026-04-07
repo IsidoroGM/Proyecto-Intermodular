@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WarMetrics - Simulador de Dados</title>
+    <style>
+        :root { --primary: #2c3e50; --accent: #e74c3c; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #ecf0f1; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 600px; width: 100%; }
+        h2 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #34495e; font-size: 0.9em; }
+        input, select { width: 100%; padding: 8px; border: 1px solid #bdc3c7; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1.1em; transition: 0.3s; }
+        button:hover { background: #c0392b; }
+        #resultado { margin-top: 20px; padding: 15px; background: #d5f5e3; border-left: 5px solid #2ecc71; color: #27ae60; font-weight: bold; display: none; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>WarMetrics v1.0</h2>
+    
+    <div class="grid">
+        <div>
+            <label>Nº Ataques:</label>
+            <input type="number" id="numAtaques" value="10">
+        </div>
+        <div>
+            <label>Daño x Ataque:</label>
+            <input type="number" id="dañoPorAtaque" value="1">
+        </div>
+        <div>
+            <label>Impactar (X+):</label>
+            <input type="number" id="impactoX" value="3" min="1" max="6">
+        </div>
+        <div>
+            <label>Repetir Impactos:</label>
+            <select id="repeticionImpacto">
+                <option value="NONE">No</option>
+                <option value="ONES">Repetir 1s</option>
+                <option value="ALL">Repetir fallos</option>
+            </select>
+        </div>
+        <div>
+            <label>Especial 6s (Impacto):</label>
+            <select id="especialSeisImpacto">
+                <option value="NONE">Nada</option>
+                <option value="EXTRA_HIT">Impacto extra</option>
+                <option value="AUTO_WOUND">Herida auto</option>
+            </select>
+        </div>
+        <div>
+            <label>Herir (X+):</label>
+            <input type="number" id="herirX" value="4" min="2" max="6">
+        </div>
+        <div>
+            <label>Salvación (X+):</label>
+            <input type="number" id="salvacionX" value="5" min="2" max="7">
+        </div>
+        <div>
+            <label>No Hay Dolor (X+):</label>
+            <input type="number" id="noHayDolorX" value="0" placeholder="0 = No tiene">
+        </div>
+    </div>
+
+    <button onclick="ejecutarSimulacion()">CALCULAR ATAQUES</button>
+
+    <div id="resultado"></div>
+</div>
+
+<script>
+    async function ejecutarSimulacion() {
+        const payload = {
+            numAtaques: parseInt(document.getElementById('numAtaques').value),
+            dañoPorAtaque: parseInt(document.getElementById('dañoPorAtaque').value),
+            impactoX: parseInt(document.getElementById('impactoX').value),
+            repeticionImpacto: document.getElementById('repeticionImpacto').value,
+            especialSeisImpacto: document.getElementById('especialSeisImpacto').value,
+            herirX: parseInt(document.getElementById('herirX').value),
+            repeticionHerir: "NONE", // Simplificado por ahora
+            seisHeridaInsalvable: false,
+            salvacionX: parseInt(document.getElementById('salvacionX').value),
+            noHayDolorX: parseInt(document.getElementById('noHayDolorX').value || 0)
+        };
+
+        try {
+            const response = await fetch('/api/combate/simular', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const texto = await response.text();
+            const resDiv = document.getElementById('resultado');
+            resDiv.innerText = texto;
+            resDiv.style.display = 'block';
+        } catch (error) {
+            alert("Error al conectar con el servidor. Asegúrate de que Spring Boot está corriendo.");
+        }
+    }
+</script>
+
+</body>
+</html>
