@@ -5,16 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WarMetrics - Simulador de Dados</title>
     <style>
-        :root { --primary: #2c3e50; --accent: #e74c3c; }
+        :root { --primary: #2c3e50; --accent: #e74c3c; --success: #2ecc71; --info: #3498db; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #ecf0f1; display: flex; justify-content: center; padding: 20px; }
         .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 600px; width: 100%; }
-        h2 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        h2 { color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; margin-top: 0; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         label { display: block; font-weight: bold; margin-bottom: 5px; color: #34495e; font-size: 0.9em; }
-        input, select { width: 100%; padding: 8px; border: 1px solid #bdc3c7; border-radius: 4px; box-sizing: border-box; }
+        input[type="number"], select { width: 100%; padding: 8px; border: 1px solid #bdc3c7; border-radius: 4px; box-sizing: border-box; }
+        .checkbox-group { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+        .checkbox-group input { transform: scale(1.2); cursor: pointer; }
         button { width: 100%; padding: 12px; background: var(--accent); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1.1em; transition: 0.3s; }
         button:hover { background: #c0392b; }
-        #resultado { margin-top: 20px; padding: 15px; background: #d5f5e3; border-left: 5px solid #2ecc71; color: #27ae60; font-weight: bold; display: none; }
+        
+        /* Estilos para los resultados */
+        .resultado-container { margin-top: 20px; display: none; gap: 10px; flex-direction: column; }
+        .caja-resultado { padding: 15px; border-radius: 8px; font-weight: bold; font-size: 1.1em; }
+        .aleatorio { background: #d5f5e3; border-left: 5px solid var(--success); color: #27ae60; }
+        .estadistica { background: #d6eaf8; border-left: 5px solid var(--info); color: #2980b9; }
+        .error { background: #fadbd8; border-left: 5px solid var(--accent); color: #c0392b; }
     </style>
 </head>
 <body>
@@ -25,11 +33,11 @@
     <div class="grid">
         <div>
             <label>Nº Ataques:</label>
-            <input type="number" id="numAtaques" value="10">
+            <input type="number" id="numAtaques" value="10" min="1">
         </div>
         <div>
             <label>Daño x Ataque:</label>
-            <input type="number" id="dañoPorAtaque" value="1">
+            <input type="number" id="dañoPorAtaque" value="1" min="1">
         </div>
         <div>
             <label>Impactar (X+):</label>
@@ -55,9 +63,11 @@
             <label>Herir (X+):</label>
             <input type="number" id="herirX" value="4" min="2" max="6">
         </div>
-        <div>
-            <label>¿6s al herir saltan armadura?</label>
-            <input type="checkbox" id="seisHeridaInsalvable" style="width: auto;">
+        <div style="grid-column: span 2;">
+            <div class="checkbox-group">
+                <input type="checkbox" id="seisHeridaInsalvable">
+                <label for="seisHeridaInsalvable" style="margin: 0;">¿Los 6s al herir saltan salvación de armadura?</label>
+            </div>
         </div>
         <div>
             <label>Salvación (X+):</label>
@@ -65,13 +75,14 @@
         </div>
         <div>
             <label>No Hay Dolor (X+):</label>
-            <input type="number" id="noHayDolorX" value="0" placeholder="0 = No tiene">
+            <input type="number" id="noHayDolorX" value="0" placeholder="0 = No tiene" min="0" max="7">
         </div>
     </div>
 
     <button onclick="ejecutarSimulacion()">CALCULAR ATAQUES</button>
 
-    <div id="resultado"></div>
+    <div id="contenedorResultados" class="resultado-container">
+        </div>
 </div>
 
 <script>
@@ -83,25 +94,46 @@
             repeticionImpacto: document.getElementById('repeticionImpacto').value,
             especialSeisImpacto: document.getElementById('especialSeisImpacto').value,
             herirX: parseInt(document.getElementById('herirX').value),
-            seisHeridaInsalvable: document.getElementById('seisHeridaInsalvable').checked, // Recoge true o false
-            repeticionHerir: "NONE", // Simplificado por ahora
-            seisHeridaInsalvable: false,
+            repeticionHerir: "NONE", // Por ahora estático, se puede añadir un select en el futuro
+            seisHeridaInsalvable: document.getElementById('seisHeridaInsalvable').checked,
             salvacionX: parseInt(document.getElementById('salvacionX').value),
             noHayDolorX: parseInt(document.getElementById('noHayDolorX').value || 0)
         };
 
+        const contenedor = document.getElementById('contenedorResultados');
+
         try {
-            const response = await fetch('/api/combate/simular', {
+            // Fíjate en la nueva URL versionada
+            const response = await fetch('http://localhost:8080/api/v1/combate/simular', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
-            const texto = await response.text();
-            const resDiv = document.getElementById('resultado');
-            resDiv.innerText = texto;
-            resDiv.style.display = 'block';
+
+            if (!response.ok) {
+                throw new Error("Error en el servidor: " + response.status);
+            }
+
+            // Ya no leemos texto, leemos el JSON de ResultadoResponse
+            const data = await response.json();
+            
+            contenedor.style.display = 'flex';
+            contenedor.innerHTML = `
+                <div class="caja-resultado aleatorio">
+                    🎲 Tirada de dados: <strong>${data.dañoAleatorio}</strong> daños realizados
+                </div>
+                <div class="caja-resultado estadistica">
+                    📊 Media (MathHammer): <strong>${data.dañoMedioEstadistico}</strong> daños esperados
+                </div>
+            `;
+
         } catch (error) {
-            alert("Error al conectar con el servidor. Asegúrate de que Spring Boot está corriendo.");
+            contenedor.style.display = 'flex';
+            contenedor.innerHTML = `
+                <div class="caja-resultado error">
+                    ⚠️ Error de conexión: Comprueba que Spring Boot está corriendo.
+                </div>
+            `;
         }
     }
 </script>

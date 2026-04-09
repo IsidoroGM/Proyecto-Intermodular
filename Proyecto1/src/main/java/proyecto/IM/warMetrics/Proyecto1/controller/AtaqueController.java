@@ -1,17 +1,19 @@
 package proyecto.IM.warMetrics.Proyecto1.controller;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import proyecto.IM.warMetrics.Proyecto1.DTO.AtaqueRequest;
+import proyecto.IM.warMetrics.Proyecto1.DTO.ResultadoResponse;
 import proyecto.IM.warMetrics.Proyecto1.Service.SimuladorService;
 
 
-@RestController
-@RequestMapping("/api/combate")
+@RestController 
+@RequestMapping("/api/v1/combate")
 // Permitimos que una web externa o local pueda llamar a este controlador
 @CrossOrigin(origins = "*")
 
@@ -24,13 +26,20 @@ public class AtaqueController {
         this.simuladorService = simuladorService;
     }
 
+    // Endpoint 1: Comprueba si el servidor está operativo (GET)
+    // Ruta completa: http://localhost:8080/api/v1/combate/status
+    @GetMapping("/status")
+    public String comprobarEstado() {
+        return "¡El motor de WarMetrics está en línea y listo para la batalla!";
+    }
+
+    // Endpoint 2: Realiza el cálculo de la simulación (POST)
+    // Ruta completa: http://localhost:8080/api/v1/combate/simular
+
     @PostMapping("/simular")
-    public String simularAtaque(@RequestBody AtaqueRequest request) {
-        // Llamamos al servicio para obtener el resultado
-        int totalHeridas = simuladorService.calcularHeridasFinales(request);
-        
-        // Devolvemos el mensaje final al front-end
-        return "El resultado de la secuencia de ataques es: " + totalHeridas + " heridas realizadas.";
+    public ResultadoResponse simularAtaque(@RequestBody AtaqueRequest request) {
+        // Ahora devolvemos directamente el objeto con los dos cálculos
+        return simuladorService.ejecutarSimulacion(request);
     }
 
 }
