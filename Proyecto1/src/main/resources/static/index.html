@@ -88,10 +88,18 @@
                             <label>Daño por Ataque</label>
                             <input type="number" id="dañoPorAtaque" value="1" min="1">
                         </div>
-                        <div class="field full-width">
+                        <div class="field">
+                            <label>Repetir Heridas</label>
+                            <select id="repeticionHerir">
+                                <option value="NONE">No repetir</option>
+                                <option value="ONES">Repetir 1s</option>
+                                <option value="ALL">Repetir fallos</option>
+                            </select>
+                        </div>
+                        <div class="field checkbox-container">
                             <label class="checkbox-label">
                                 <input type="checkbox" id="seisHeridaInsalvable">
-                                ¿Los 6s al herir saltan salvación de armadura?
+                                <span>Heridas devastadoras</span>
                             </label>
                         </div>
                     </div>
