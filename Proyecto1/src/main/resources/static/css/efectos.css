@@ -1,0 +1,46 @@
+/* Definimos la animación 'girarDado' */
+#web-icon {
+    height: 55px; /* O el tamaño que prefieras */
+    width: auto;
+    display: block;
+    cursor: pointer;
+    /* Suaviza la vuelta a la posición inicial al quitar el ratón */
+    transition: transform 0.3s ease-out; 
+}
+
+/* Estado al pasar el ratón por encima (hover) */
+.refresh-logo:hover #web-icon {
+    /* Aplicamos la animación 'rodarDado' */
+    animation-name: rodarDado;
+    animation-duration: 0.8s; /* Duración de una vuelta completa */
+    animation-timing-function: linear; /* Velocidad constante para el giro */
+    animation-iteration-count: infinite; /* Sigue girando mientras esté el ratón encima */
+}
+
+/* Definición de la animación 'rodarDado' */
+@keyframes rodarDado {
+    0% {
+        transform: rotate(0deg) scale(1); /* Estado inicial */
+    }
+    15% {
+        transform: rotate(45deg) scale(1.1); /* Primer giro y pequeño salto */
+    }
+    30% {
+        transform: rotate(90deg) scale(1.05); /* Sigue girando */
+    }
+    45% {
+        transform: rotate(135deg) scale(1.1); /* Otro pequeño salto */
+    }
+    60% {
+        transform: rotate(180deg) scale(1.05); /* Sigue girando */
+    }
+    75% {
+        transform: rotate(225deg) scale(1.1); /* Otro pequeño salto */
+    }
+    90% {
+        transform: rotate(270deg) scale(1.05); /* Casi al final */
+    }
+    100% {
+        transform: rotate(360deg) scale(1); /* Vuelta completa y vuelve al tamaño original */
+    }
+}

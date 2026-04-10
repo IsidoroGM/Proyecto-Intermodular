@@ -1,0 +1,188 @@
+/* Configuración Global */
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden; /* Evita scroll en toda la página, solo en el centro */
+}
+
+/*-------------------------HEADER-------------------------------*/
+.main-header {
+    display: flex;
+    justify-content: space-between; /* Distribuye las 3 secciones */
+    align-items: center;
+    background-color: #2c3e50; /* [cite: 594, 1370] */
+    padding: 0 20px;
+    height: 70px;
+    color: white;
+}
+/* Estas tres clases aseguran que el centro sea el centro real */
+.header-left, .header-right {
+    flex: 1; 
+}
+
+.header-center {
+    flex: 0; /* El centro solo ocupa lo que mida la imagen */
+    display: flex;
+    justify-content: center;
+}
+
+.header-right {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Estilo del Icono */
+#web-icon {
+    height: 55px; /* Altura ajustada para que quepa bien en el header de 70px */
+    width: auto;  /* Mantiene la proporción original */
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+#web-icon:hover {
+    transform: scale(1.1); /* Crece un poquito al pasar el ratón */
+    filter: brightness(1.2); /* Brilla un poco para indicar que es clicable */
+}
+
+.logo-text { font-size: 1.2rem; font-weight: bold; }
+.logo-text span { color: #e74c3c; font-size: 0.7rem; }
+/*-------------------------HEADER-------------------------------*/
+
+.logo { font-size: 1.5rem; font-weight: bold; }
+.logo span { color: #e74c3c; font-size: 0.8rem; }
+
+/* Layout Principal */
+.main-layout {
+    display: flex;
+    flex: 1; /* Ocupa el resto de la pantalla debajo del header */
+    overflow: hidden;
+}
+
+/* Sidebars Generales */
+.sidebar {
+    background-color: #ffffff;
+    width: 200px;
+    padding: 20px;
+    border: 1px solid #dcdde1;
+    overflow-y: auto;
+}
+
+.left-sidebar { border-right: 1px solid #bdc3c7; }
+.right-sidebar { border-left: 1px solid #bdc3c7; width: 250px; }
+
+.sidebar h3 { 
+    font-size: 0.9rem; 
+    text-transform: uppercase; 
+    color: #7f8c8d; 
+    margin-bottom: 15px;
+}
+
+/* Estilo de enlaces en sidebar */
+.sidebar ul { list-style: none; padding: 0; }
+.sidebar ul li a {
+    display: block;
+    padding: 10px;
+    color: #2c3e50;
+    text-decoration: none;
+    border-radius: 4px;
+    margin-bottom: 5px;
+}
+.sidebar ul li a.active, .sidebar ul li a:hover {
+    background-color: #e74c3c;
+    color: white;
+}
+
+/* Área de Contenido Central */
+.content-area {
+    flex: 1; /* Se expande para ocupar el centro */
+    padding: 30px;
+    background-color: #ecf0f1;
+    overflow-y: auto;
+}
+
+/* Estilos de la Tarjeta del Simulador */
+.simulator-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    max-width: 800px;
+    margin: 0 auto;
+    border-top: 5px solid #e74c3c;
+}
+
+.card-header { padding: 20px; border-bottom: 1px solid #eee; }
+.card-header h2 { margin: 0; color: #2c3e50; }
+.card-header p { margin: 5px 0 0; color: #7f8c8d; font-size: 0.9rem; }
+
+.card-body { padding: 20px; }
+
+/* Agrupación por fases */
+.step-group {
+    border: 1px solid #edeff2;
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+.step-group legend {
+    font-weight: bold;
+    color: #e74c3c;
+    padding: 0 10px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+/* Rejilla de inputs */
+.input-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.field label {
+    display: block;
+    font-size: 0.85rem;
+    margin-bottom: 5px;
+    color: #34495e;
+}
+
+.field input, .field select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #dcdde1;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.full-width { grid-column: 1 / -1; }
+
+.checkbox-label {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: normal !important;
+}
+
+/* Botón y Resultados */
+.card-footer { padding: 20px; background: #f9f9f9; text-align: center; }
+.btn-primary {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.btn-primary:hover { background: #c0392b; transform: translateY(-2px); }
+
+.results-area {
+    margin-top: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}

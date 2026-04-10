@@ -63,7 +63,7 @@ Cuerpo de la petición (JSON):
     "noHayDolorX": 6
 }
 
-Notas sobre parámetros: repeticion acepta "NONE", "ONES" o "ALL". especialSeisImpacto acepta "NONE", "EXTRA_HIT" o "AUTO_WOUND".
+## Notas sobre parámetros: repeticion acepta "NONE", "ONES" o "ALL". especialSeisImpacto acepta "NONE", "EXTRA_HIT" o "AUTO_WOUND".
 
 Respuesta (JSON):
 
