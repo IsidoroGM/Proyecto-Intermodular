@@ -82,6 +82,28 @@
 			<artifactId>lombok</artifactId>
 			<scope>compile</scope>
 		</dependency>
+
+		<!-- Starter data JPA para trabajar con bases de datos relacionales y utilizar JPA (Java Persistence API) para la gestión de datos.
+		 Fuente: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa  -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+
+		<!-- H2 Database Engine es una base de datos relacional escrita en Java. Es una base de datos en memoria que se utiliza comúnmente para pruebas y desarrollo debido a su facilidad de uso y configuración.
+		 Fuente: https://mvnrepository.com/artifact/com.h2database/h2 -->
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<!-- H2 Console es una herramienta web que permite interactuar con la base de datos H2 a través de un navegador. Proporciona una interfaz gráfica para ejecutar consultas SQL, administrar tablas y visualizar datos.
+		 Fuente: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-h2console -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-h2console</artifactId>
+		</dependency>
 	</dependencies>
 
 	
@@ -96,3 +118,8 @@
 	</build>
 
 </project>
+<!--
+  - Este es el archivo de configuración de Maven para el proyecto. Aquí se definen las dependencias necesarias para el proyecto, como Spring Boot, Thymeleaf, Actuator, Security, JPA y H2 Database.
+  - También se especifica la versión de Java que se utilizará (Java 21) y se configura el plugin de Spring Boot para facilitar la construcción y ejecución del proyecto.
+  - Las dependencias incluidas permiten desarrollar una aplicación web con capacidades de monitoreo (Actuator), seguridad básica (Security), acceso a datos relacionales (JPA) y una base de datos en memoria para pruebas (H2).
+-->
