@@ -1,0 +1,50 @@
+package proyecto.IM.warMetrics.Proyecto1.controller;
+
+//Este será el encargado de gestionar las tiradas guardadas y de devolver el historial cuando el usuario haga clic en la pestaña "Historial".
+//Recibirá las peticiones del frontend, se comunicará con el SimuladorService para guardar las tiradas, y con el HistorialTiradaRepository para recuperar el historial de un usuario específico.
+
+import java.util.List;
+
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import proyecto.IM.warMetrics.Proyecto1.Service.SimuladorService;
+import proyecto.IM.warMetrics.Proyecto1.dto.GuardarTiradasRequest;
+import proyecto.IM.warMetrics.Proyecto1.model.HistorialTirada;
+import proyecto.IM.warMetrics.Proyecto1.repository.HistorialTiradaRepository;
+
+@RestController
+@RequestMapping("/api/historial")
+@CrossOrigin(origins = "*")
+public class HistorialController {
+
+    private final SimuladorService simuladorService;
+    private final HistorialTiradaRepository historialRepository;
+
+    public HistorialController(SimuladorService simuladorService, HistorialTiradaRepository historialRepository) {
+        this.simuladorService = simuladorService;
+        this.historialRepository = historialRepository;
+    }
+
+    @PostMapping("/guardar")
+    public String guardar(@RequestBody GuardarTiradasRequest request) {
+        simuladorService.guardarEnHistorial(
+            request.getUsuarioId(), 
+            request.getTitulo(), 
+            request.getNotas(), 
+            request.getAleatorio(), 
+            request.getMedia()
+        );
+        return "Tirada guardada en el historial.";
+    }
+
+    @GetMapping("/usuario/{id}")
+    public List<HistorialTirada> obtenerHistorial(@PathVariable Long id) {
+        return historialRepository.findByUsuarioIdOrderByFechaCreacionDesc(id);
+    }
+}
