@@ -44,6 +44,19 @@ public class AuthService {
 
         return "Usuario registrado con éxito.";
     }
+ 
+    // Método que asegura que las contraseñas coiniciden.
+    public Usuario login(String username, String password) {
+        Usuario usuario = usuarioRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Comparamos la contraseña escrita con la cifrada de la BBDD
+        if (passwordEncoder.matches(password, usuario.getPassword())) {
+            return usuario;
+        } else {
+            throw new RuntimeException("Contraseña incorrecta");
+        }
+    }
 
 
 }

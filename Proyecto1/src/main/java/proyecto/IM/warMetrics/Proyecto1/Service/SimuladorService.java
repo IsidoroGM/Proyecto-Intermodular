@@ -6,10 +6,24 @@ import org.springframework.stereotype.Service;
 
 import proyecto.IM.warMetrics.Proyecto1.dto.AtaqueRequest;
 import proyecto.IM.warMetrics.Proyecto1.dto.ResultadoResponse;
+import proyecto.IM.warMetrics.Proyecto1.model.HistorialTirada;
+import proyecto.IM.warMetrics.Proyecto1.model.Usuario;
+import proyecto.IM.warMetrics.Proyecto1.repository.HistorialTiradaRepository;
+import proyecto.IM.warMetrics.Proyecto1.repository.UsuarioRepository;
 
 @Service
 public class SimuladorService {
 
+    private final UsuarioRepository usuarioRepository;
+    private final HistorialTiradaRepository historialRepository;
+
+    // --- CONSTRUCTOR PARA INYECCIÓN DE DEPENDENCIAS ---
+    public SimuladorService(UsuarioRepository usuarioRepository, HistorialTiradaRepository historialRepository) {
+        this.usuarioRepository = usuarioRepository;
+        this.historialRepository = historialRepository;
+    }
+
+    // --- MÉTODO PRINCIPAL DE SIMULACIÓN ---
     public ResultadoResponse ejecutarSimulacion(AtaqueRequest req) {
         int aleatorio = calcularHeridasAleatorias(req);
 
@@ -19,36 +33,41 @@ public class SimuladorService {
         return new ResultadoResponse(aleatorio, mediaRedondeada);
     }
 
-    // ------------------- SIMULACIÓN REAL -------------------
+    // --- NUEVO MÉTODO PARA GUARDAR EN BASE DE DATOS ---
+    public void guardarEnHistorial(Long usuarioId, String titulo, String notas, int aleatorio, double media) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        HistorialTirada registro = new HistorialTirada(titulo, notas, aleatorio, media, usuario);
+        historialRepository.save(registro);
+    }
+
+    // ------------------- SIMULACIÓN REAL (ALEATORIA) -------------------
     private int calcularHeridasAleatorias(AtaqueRequest req) {
         int impactos = 0;
         int heridasEfectivas = 0;
         int heridasTrasSalvacion = 0;
         int dañoFinal = 0;
-
         int heridasAutomaticas = 0;
 
-        //------------------ 1. Fase de impacto ------------------
+        // 1. Fase de impacto
         for (int i = 0; i < req.getNumAtaques(); i++) {
             int resultado = tirarD6(req.getRepeticionImpacto(), req.getImpactoX());
-
             if (resultado >= req.getImpactoX() || req.getImpactoX() <= 1) {
                 impactos++;
-
                 if (resultado == 6) {
                     if ("EXTRA_HIT".equals(req.getEspecialSeisImpacto())) {
                         impactos++;
                     } else if ("AUTO_WOUND".equals(req.getEspecialSeisImpacto())) {
-                        heridasAutomaticas++; // ✅ NO quitamos impacto
+                        heridasAutomaticas++;
                     }
                 }
             }
         }
 
-        //------------------ 2. Fase de herir ------------------
+        // 2. Fase de herir
         for (int i = 0; i < impactos; i++) {
             int resultado = tirarD6(req.getRepeticionHerir(), req.getHerirX());
-
             if (resultado == 6 && req.isSeisHeridaInsalvable()) {
                 heridasTrasSalvacion++;
             } else if (resultado >= req.getHerirX()) {
@@ -56,25 +75,21 @@ public class SimuladorService {
             }
         }
 
-        // Añadimos heridas automáticas directamente a salvación
         heridasEfectivas += heridasAutomaticas;
 
-        //------------------ 3. Salvación ------------------
+        // 3. Salvación
         for (int i = 0; i < heridasEfectivas; i++) {
             int tirada = ThreadLocalRandom.current().nextInt(1, 7);
-
             if (tirada < req.getSalvacionX()) {
                 heridasTrasSalvacion++;
             }
         }
 
-        //------------------ 4. Daño + FNP ------------------
+        // 4. Daño + FNP
         for (int i = 0; i < heridasTrasSalvacion; i++) {
             for (int d = 0; d < req.getDañoPorAtaque(); d++) {
-
                 if (req.getNoHayDolorX() > 0) {
                     int tirada = ThreadLocalRandom.current().nextInt(1, 7);
-
                     if (tirada < req.getNoHayDolorX()) {
                         dañoFinal++;
                     }
@@ -83,19 +98,16 @@ public class SimuladorService {
                 }
             }
         }
-
         return dañoFinal;
     }
 
     private int tirarD6(String repeticion, int umbral) {
         int dado = ThreadLocalRandom.current().nextInt(1, 7);
-
         if ("ONES".equals(repeticion) && dado == 1) {
             dado = ThreadLocalRandom.current().nextInt(1, 7);
         } else if ("ALL".equals(repeticion) && dado < umbral) {
             dado = ThreadLocalRandom.current().nextInt(1, 7);
         }
-
         return dado;
     }
 
@@ -103,7 +115,7 @@ public class SimuladorService {
     private double calcularMediaEstadistica(AtaqueRequest req) {
         double ataques = req.getNumAtaques();
 
-        //------------------ 1. Impactos ------------------
+        // 1. Impactos
         double probImpactoBase = calcularProbBase(req.getImpactoX());
         double probImpactoTotal = calcularProbConRepeticion(probImpactoBase, req.getRepeticionImpacto());
         double probSeisImpacto = calcularProbSeis(req.getRepeticionImpacto());
@@ -117,7 +129,7 @@ public class SimuladorService {
             heridasAutomaticas += ataques * probSeisImpacto;
         }
 
-        //------------------ 2. Heridas ------------------
+        // 2. Heridas
         double probHeridaBase = calcularProbBase(req.getHerirX());
         double probHeridaTotal = calcularProbConRepeticion(probHeridaBase, req.getRepeticionHerir());
         double probSeisHerida = calcularProbSeis(req.getRepeticionHerir());
@@ -132,13 +144,13 @@ public class SimuladorService {
             heridasParaSalvar += impactosNormales * probHeridaTotal;
         }
 
-        //------------------ 3. Salvación ------------------
+        // 3. Salvación
         double probFalloSalvacion = Math.min(1.0, Math.max(0.0, (req.getSalvacionX() - 1.0) / 6.0));
         if (req.getSalvacionX() > 6) probFalloSalvacion = 1.0;
 
         double heridasTotalesQuePasan = (heridasParaSalvar * probFalloSalvacion) + heridasInsalvables;
 
-        //------------------ 4. Daño ------------------
+        // 4. Daño
         double dañoFinal = heridasTotalesQuePasan * req.getDañoPorAtaque();
 
         if (req.getNoHayDolorX() > 0) {
@@ -150,7 +162,6 @@ public class SimuladorService {
     }
 
     // ------------------- UTILIDADES -------------------
-
     private double calcularProbBase(int umbral) {
         if (umbral <= 1) return 1.0;
         return Math.min(1.0, Math.max(0.0, (7.0 - umbral) / 6.0));
@@ -170,7 +181,6 @@ public class SimuladorService {
 
     private double calcularProbSeis(String repeticion) {
         double base = 1.0 / 6.0;
-
         switch (repeticion) {
             case "ONES":
                 return base + (1.0 / 6.0) * base;
