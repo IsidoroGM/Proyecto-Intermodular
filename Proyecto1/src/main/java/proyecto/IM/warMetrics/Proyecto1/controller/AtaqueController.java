@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import proyecto.IM.warMetrics.Proyecto1.DTO.AtaqueRequest;
-import proyecto.IM.warMetrics.Proyecto1.DTO.ResultadoResponse;
 import proyecto.IM.warMetrics.Proyecto1.Service.SimuladorService;
+import proyecto.IM.warMetrics.Proyecto1.dto.AtaqueRequest;
+import proyecto.IM.warMetrics.Proyecto1.dto.ResultadoResponse;
 
 
 @RestController 

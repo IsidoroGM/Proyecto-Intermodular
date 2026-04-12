@@ -4,8 +4,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.stereotype.Service;
 
-import proyecto.IM.warMetrics.Proyecto1.DTO.AtaqueRequest;
-import proyecto.IM.warMetrics.Proyecto1.DTO.ResultadoResponse;
+import proyecto.IM.warMetrics.Proyecto1.dto.AtaqueRequest;
+import proyecto.IM.warMetrics.Proyecto1.dto.ResultadoResponse;
 
 @Service
 public class SimuladorService {

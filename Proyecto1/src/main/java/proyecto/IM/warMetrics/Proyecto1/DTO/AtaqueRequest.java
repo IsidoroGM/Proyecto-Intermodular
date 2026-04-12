@@ -1,4 +1,4 @@
-package proyecto.IM.warMetrics.Proyecto1.DTO;
+package proyecto.IM.warMetrics.Proyecto1.dto;
 
 /**
  * Esta clase es el molde que recibirá los datos desde el formulario web.

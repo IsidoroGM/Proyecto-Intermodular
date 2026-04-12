@@ -1,4 +1,4 @@
-package proyecto.IM.warMetrics.Proyecto1.DTO;
+package proyecto.IM.warMetrics.Proyecto1.dto;
 
 public class ResultadoResponse {
     private int dañoAleatorio;
