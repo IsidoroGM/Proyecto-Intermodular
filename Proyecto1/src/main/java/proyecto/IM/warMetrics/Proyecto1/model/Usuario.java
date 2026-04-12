@@ -1,17 +1,20 @@
 package proyecto.IM.warMetrics.Proyecto1.model;
 
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
-
-
-    @Entity // Le dice a Spring: "Esta clase es una tabla de la base de datos"
-    @Table(name = "usuarios") // Nombramos la tabla en plural por convención
-    public class Usuario {
+// --- ENTIDAD USUARIO ---
+@Entity // Le dice a Spring: "Esta clase es una tabla de la base de datos"
+@Table(name = "usuarios") // Nombramos la tabla en plural por convención
+public class Usuario {
 
     @Id // Define que este campo es la Clave Primaria (el identificador único)
     @GeneratedValue(strategy = GenerationType.IDENTITY) // Hace que el ID sea autoincremental (1, 2, 3...)
@@ -25,6 +28,15 @@ import jakarta.persistence.Table;
 
     @Column(nullable = false, unique = true)
     private String email;
+
+    // --- RELACIONES CON OTRAS TABLAS ---
+    // Un usuario puede tener muchas Tarjetas de Unidad
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TarjetaUnidad> tarjetas;
+
+    // Un usuario puede tener muchas Tiradas en su Historial
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HistorialTirada> historial;
 
     // JPA exige siempre un constructor vacío
     public Usuario() {
@@ -50,4 +62,10 @@ import jakarta.persistence.Table;
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
+    // Getters y Setters de las Relaciones
+    public List<TarjetaUnidad> getTarjetas() { return tarjetas; }
+    public void setTarjetas(List<TarjetaUnidad> tarjetas) { this.tarjetas = tarjetas; }
+
+    public List<HistorialTirada> getHistorial() { return historial; }
+    public void setHistorial(List<HistorialTirada> historial) { this.historial = historial; }
 }
