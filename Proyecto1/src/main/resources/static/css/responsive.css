@@ -1,0 +1,67 @@
+/* ========================================= */
+/* 📱 WAR-METRICS RESPONSIVE MODULE          */
+/* ========================================= */
+
+/* TABLETS Y PANTALLAS MEDIANAS (Menos de 1024px) */
+@media (max-width: 1024px) {
+    .main-layout {
+        display: flex;
+        flex-direction: column; /* Apilamos las sidebars arriba y abajo */
+    }
+
+    .sidebar {
+        width: 100% !important;
+        min-height: auto !important;
+        border: none;
+        border-bottom: 1px solid var(--border-dark);
+    }
+
+    /* El menú de navegación se vuelve horizontal */
+    #user-panel ul {
+        display: flex;
+        justify-content: space-around;
+        padding: 0;
+        flex-wrap: wrap;
+    }
+
+    #user-panel ul li {
+        margin-bottom: 0;
+    }
+}
+
+/* MÓVILES (Menos de 768px) */
+@media (max-width: 768px) {
+    /* Ajustamos el Header */
+    .main-header {
+        flex-direction: column;
+        height: auto;
+        padding: 15px;
+        gap: 15px;
+    }
+
+    /* Los formularios pasan de 2 columnas a 1 sola para que los inputs sean grandes */
+    .input-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* Ajuste de márgenes para que la tarjeta no pegue al borde del móvil */
+    .content-area {
+        padding: 10px;
+    }
+
+    .simulator-card {
+        margin: 0;
+        border-radius: 0; /* En móvil queda mejor sin bordes redondeados laterales */
+    }
+
+    /* Botones 'Touch-Friendly' (Más grandes para el dedo) */
+    .btn-primary {
+        height: 55px;
+        font-size: 1.1em;
+    }
+
+    /* Las tarjetas de la armería se ponen una debajo de otra */
+    #lista-tarjetas-unidad {
+        grid-template-columns: 1fr !important;
+    }
+}
