@@ -27,7 +27,12 @@ async function hacerLogin() {
 
         if (response.ok) {
             usuarioActual = await response.json();
-            localStorage.setItem('warmetrics_user', JSON.stringify(usuarioActual)); // Guardamos sesión
+            
+            // Guardamos sesión
+            localStorage.setItem('warmetrics_user', JSON.stringify(usuarioActual)); 
+            // Guardamos el ID suelto por compatibilidad con el script principal del historial
+            localStorage.setItem('usuarioId', usuarioActual.id); 
+            
             actualizarInterfazAuth();
             msj.innerText = '';
         } else {
@@ -66,33 +71,49 @@ async function hacerRegistro() {
         msj.innerText = "Error de conexión.";
     }
 }
-
-// 4. Cerrar Sesión
+// 4. Cerrar Sesión (Versión Definitiva)
 function cerrarSesion() {
+    // 1. Borramos todo rastro del usuario en la memoria del navegador
     usuarioActual = null;
     localStorage.removeItem('warmetrics_user');
-    actualizarInterfazAuth();
+    localStorage.removeItem('usuarioId');
+
+    // 2. Recargamos la página por completo (como pulsar F5)
+    // Esto fuerza a la web a reiniciarse limpia y mostrará el Login por defecto
+    window.location.reload();
 }
 
-// 5. Actualizar la interfaz según si estamos logueados o no
+// 5. Actualizar la interfaz 
 function actualizarInterfazAuth() {
     const authPanel = document.getElementById('auth-panel');
     const userPanel = document.getElementById('user-panel');
+    const msj = document.getElementById('auth-mensaje');
     
     if (usuarioActual) {
-        // Estamos logueados
+        // --- ESTADO: LOGUEADO ---
         document.getElementById('bienvenida-usuario').innerText = `Hola, ${usuarioActual.username}`;
+        
+        // INTERCAMBIO VISUAL TOTAL (Modo seguro)
         authPanel.classList.remove('pantalla-activa');
         authPanel.classList.add('pantalla-oculta');
+        
         userPanel.classList.remove('pantalla-oculta');
         userPanel.classList.add('pantalla-activa');
+        
+        if (msj) msj.innerText = '';
+        console.log("Sistema: Panel de acceso oculto. Panel de usuario activo.");
+
     } else {
-        // No estamos logueados
+        // --- ESTADO: NO LOGUEADO ---
         authPanel.classList.remove('pantalla-oculta');
         authPanel.classList.add('pantalla-activa');
+        
         userPanel.classList.remove('pantalla-activa');
         userPanel.classList.add('pantalla-oculta');
-        cambiarPantalla('simulador'); // Forzamos a ver el simulador si cierra sesión en otra pestaña
+        
+        if (typeof cambiarPantalla === "function") {
+            cambiarPantalla('simulador'); 
+        }
     }
 }
 
@@ -104,3 +125,18 @@ document.addEventListener("DOMContentLoaded", () => {
         actualizarInterfazAuth();
     }
 });
+
+// --- FUNCIONALIDAD: MOSTRAR/OCULTAR CONTRASEÑA ---
+// Esta función cambia a text o el input de contraseña para mostrarla, y vuelve a password para ocultarla. También cambia el icono del ojo.
+function togglePasswordVisibility() {
+    const passInput = document.getElementById('auth-password');
+    const eyeIcon = document.getElementById('toggle-eye');
+    
+    if (passInput.type === 'password') {
+        passInput.type = 'text'; // Mostramos el texto
+        eyeIcon.innerText = '🙈'; // Cambiamos el icono a un monito tapándose los ojos (o el que prefieras)
+    } else {
+        passInput.type = 'password'; // Ocultamos el texto
+        eyeIcon.innerText = '👁️'; // Volvemos al ojo normal
+    }
+}

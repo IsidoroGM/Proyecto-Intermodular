@@ -1,9 +1,9 @@
+let ultimoResultado = null; // Guardará el último cálculo hecho
+
 /**
  * Función principal para ejecutar la simulación de combate.
- * Envía los datos al servidor Spring Boot y actualiza la interfaz.
  */
 async function ejecutarSimulacion() {
-    // 1. Recogemos todos los valores actualizados de la interfaz
     const payload = {
         numAtaques: parseInt(document.getElementById('numAtaques').value),
         dañoPorAtaque: parseInt(document.getElementById('dañoPorAtaque').value),
@@ -11,10 +11,7 @@ async function ejecutarSimulacion() {
         repeticionImpacto: document.getElementById('repeticionImpacto').value,
         especialSeisImpacto: document.getElementById('especialSeisImpacto').value,
         herirX: parseInt(document.getElementById('herirX').value),
-        
-        // MODIFICACIÓN: Ahora recogemos el valor del nuevo desplegable de heridas
         repeticionHerir: document.getElementById('repeticionHerir').value, 
-        
         seisHeridaInsalvable: document.getElementById('seisHeridaInsalvable').checked,
         salvacionX: parseInt(document.getElementById('salvacionX').value),
         noHayDolorX: parseInt(document.getElementById('noHayDolorX').value || 0)
@@ -23,21 +20,29 @@ async function ejecutarSimulacion() {
     const contenedor = document.getElementById('contenedorResultados');
 
     try {
-        // 2. Realizamos la petición POST al endpoint versionado [cite: 1153, 1154]
         const response = await fetch('http://localhost:8080/api/v1/combate/simular', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
         });
 
-        if (!response.ok) {
-            throw new Error("Error en el servidor: " + response.status);
-        }
+        if (!response.ok) throw new Error("Error en el servidor");
 
-        // 3. Procesamos la respuesta JSON del servidor [cite: 1316, 1321]
         const data = await response.json(); 
         
-        // 4. Actualizamos el contenedor central de resultados [cite: 1324, 1325]
+        // 1. GUARDAMOS EL RESULTADO EN LA MEMORIA
+        ultimoResultado = data; 
+
+        // 2. MOSTRAMOS EL PANEL DE GUARDAR (Solo si hay usuario conectado)
+        if (typeof usuarioActual !== 'undefined' && usuarioActual !== null) {
+            const panelGuardar = document.getElementById('panel-guardar-tirada');
+            if (panelGuardar) {
+                panelGuardar.classList.remove('pantalla-oculta');
+                panelGuardar.classList.add('pantalla-activa');
+            }
+        }
+        
+        // 3. Mostramos resultados centrales
         contenedor.style.display = 'flex';
         contenedor.innerHTML = `
             <div class="caja-resultado aleatorio">
@@ -48,47 +53,34 @@ async function ejecutarSimulacion() {
             </div>
         `;
 
-        // 5. ACTUALIZACIÓN: Añadir al Resumen Rápido (Sidebar Derecha)
-        // Colocamos esto AQUÍ dentro para que tenga acceso a 'payload' y 'data'
+        // 4. Añadimos al Resumen Rápido
         const quickStats = document.getElementById('quick-stats');
         if (quickStats) {
             const nuevaEntrada = document.createElement('div');
             nuevaEntrada.style.padding = "10px";
-            nuevaEntrada.style.borderBottom = "1px solid #eee";
+            nuevaEntrada.style.borderBottom = "1px solid var(--border-dark)";
             nuevaEntrada.style.fontSize = "0.85rem";
-            nuevaEntrada.style.backgroundColor = "#fff";
             nuevaEntrada.innerHTML = `
                 <strong>Ataque:</strong> ${payload.numAtaques} dados<br>
-                <strong>Resultado:</strong> ${data.dañoAleatorio} | <strong>Media:</strong> ${data.dañoMedioEstadistico}
+                <strong>Resultado:</strong> <span style="color:var(--accent)">${data.dañoAleatorio}</span> | <strong>Media:</strong> ${data.dañoMedioEstadistico}
             `;
-            // Insertar al principio de la lista para ver siempre lo más reciente arriba
             quickStats.prepend(nuevaEntrada);
-            
-            // Si el mensaje de "No hay datos" existe, lo borramos
             const placeholder = quickStats.querySelector('p');
             if (placeholder) placeholder.remove();
         }
 
     } catch (error) {
-        // En caso de error, mostramos el mensaje visual en el contenedor
         contenedor.style.display = 'flex';
-        contenedor.innerHTML = `
-            <div class="caja-resultado error">
-                ⚠️ Error de conexión: Comprueba que Spring Boot está corriendo.
-            </div>
-        `;
-        console.error("Error en la simulación:", error);
+        contenedor.innerHTML = `<div class="caja-resultado error">⚠️ Error de conexión.</div>`;
     }
 }
 
 /**
- * Verificación del estado del servidor al cargar la página.
+ * Verificación del estado del servidor
  */
 window.onload = async function() {
     try {
-        // Petición al endpoint de salud del motor [cite: 1147, 1148]
         const response = await fetch('http://localhost:8080/api/v1/combate/status'); 
-        
         const statusElement = document.getElementById('motor-status');
         if (response.ok && statusElement) {
             statusElement.innerText = "ONLINE";
@@ -100,6 +92,35 @@ window.onload = async function() {
             statusElement.innerText = "OFFLINE";
             statusElement.style.color = "#e74c3c";
         }
-        console.error("El servidor no responde:", error);
     }
 };
+
+/**
+ * Función para alternar entre las diferentes pantallas centrales de la aplicación
+ */
+function cambiarPantalla(destino) {
+    // 1. Ocultar todas las pantallas (Añade aquí más si creas nuevas)
+    const simulador = document.querySelector('.content-area');
+    const historial = document.getElementById('historial-completo'); // Si existe
+    
+    // Por ahora, como solo tenemos el simulador en el HTML principal, 
+    // prepararemos la estructura. Si el destino es simulador, lo mostramos:
+    if (destino === 'simulador') {
+        if (simulador) simulador.style.display = 'block';
+    } else {
+        // Cuando creemos las otras pestañas (Unidades e Historial), 
+        // aquí las mostraremos y ocultaremos el simulador.
+        if (simulador) simulador.style.display = 'none';
+        console.log("Navegando a la sección:", destino);
+    }
+
+    // 2. Cambiar el color del menú para saber dónde estamos
+    document.querySelectorAll('.sidebar ul li a').forEach(enlace => {
+        enlace.classList.remove('active');
+    });
+    
+    const menuActivo = document.getElementById('menu-' + destino);
+    if (menuActivo) {
+        menuActivo.classList.add('active');
+    }
+}

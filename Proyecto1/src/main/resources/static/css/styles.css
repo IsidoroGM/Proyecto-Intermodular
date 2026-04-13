@@ -272,3 +272,13 @@ body {
     margin-bottom: 10px;
 }
 #quick-stats div strong { color: var(--text-main); }
+
+
+/* CSS para ocultar/mostrar elementos de forma absoluta */
+.pantalla-oculta {
+    display: none !important;
+}
+
+.pantalla-activa {
+    display: block !important; /* O 'flex' si prefieres ese diseño */
+}

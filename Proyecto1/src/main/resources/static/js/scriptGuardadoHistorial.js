@@ -1,24 +1,16 @@
-// --- FUNCIONALIDAD DE GUARDADO ---
-
-let ultimoResultado = null; // Guardará el último cálculo hecho
-
-// Modifica tu función ejecutarSimulacion() para que al final asigne los datos:
-// ... dentro del try de ejecutarSimulacion ...
-const data = await response.json();
-ultimoResultado = data; // Guardamos para poder salvarlo luego
-
-if (usuarioActual) {
-    document.getElementById('panel-guardar-tirada').classList.remove('pantalla-oculta');
-    document.getElementById('panel-guardar-tirada').classList.add('pantalla-activa');
-}
-// ... resto de la función ...
+// --- FUNCIONALIDAD DE GUARDADO Y VISTA DE HISTORIAL ---
 
 async function enviarGuardado() {
     const titulo = document.getElementById('save-titulo').value;
     const notas = document.getElementById('save-notas').value;
 
     if (!titulo) {
-        alert("Por favor, ponle un título a la tirada");
+        alert("Por favor, ponle un título a la tirada.");
+        return;
+    }
+
+    if (!ultimoResultado) {
+        alert("No hay ninguna simulación reciente para guardar.");
         return;
     }
 
@@ -39,21 +31,33 @@ async function enviarGuardado() {
 
         if (response.ok) {
             alert("¡Tirada guardada con éxito!");
-            document.getElementById('panel-guardar-tirada').classList.add('pantalla-oculta');
+            // Ocultamos el panel de guardado
+            const panelGuardar = document.getElementById('panel-guardar-tirada');
+            panelGuardar.classList.remove('pantalla-activa');
+            panelGuardar.classList.add('pantalla-oculta');
+            
+            // Limpiamos los inputs
             document.getElementById('save-titulo').value = '';
             document.getElementById('save-notas').value = '';
-            cargarHistorialVisual(); // Refrescar la pantalla de historial
+            
+            // Refrescamos la pestaña historial si existe la función
+            if (typeof cargarHistorialVisual === 'function') {
+                cargarHistorialVisual(); 
+            }
+        } else {
+            alert("Error al guardar en el servidor.");
         }
     } catch (e) {
-        alert("Error al guardar.");
+        alert("Error de conexión al intentar guardar.");
     }
 }
 
-// Función para cargar el historial en la pestaña correspondiente
 async function cargarHistorialVisual() {
     if (!usuarioActual) return;
 
     const lista = document.getElementById('historial-completo');
+    if (!lista) return; // Si no estamos en esa pestaña, evitamos errores
+
     try {
         const response = await fetch(`http://localhost:8080/api/historial/usuario/${usuarioActual.id}`);
         const tiradas = await response.json();

@@ -36,10 +36,13 @@
             <div id="auth-panel" class="pantalla-activa">
                 <h3>Acceso a la Armería</h3>
                 <div class="field" style="margin-bottom: 10px;">
-                    <input type="text" id="auth-username" placeholder="Usuario" style="width: 100%; padding: 8px;">
+                    <input type="text" id="auth-username" placeholder="Usuario" autocomplete="off" style="width: 100%; padding: 8px;">
                 </div>
-                <div class="field" style="margin-bottom: 10px;">
-                    <input type="password" id="auth-password" placeholder="Contraseña" style="width: 100%; padding: 8px;">
+                <div class="field" style="position: relative; margin-bottom: 10px;">
+                    <input type="password" id="auth-password" placeholder="Contraseña" autocomplete="new-password" style="width: 100%; padding: 8px; padding-right: 35px;">
+                    <span id="toggle-eye" onclick="togglePasswordVisibility()" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); font-size: 1.2em;">
+                        👁️
+                    </span>
                 </div>
                 <div class="field" id="campo-email" style="display: none; margin-bottom: 10px;">
                     <input type="email" id="auth-email" placeholder="Correo Electrónico" style="width: 100%; padding: 8px;">
@@ -62,7 +65,7 @@
                     <li><a href="#" id="menu-unidades" onclick="cambiarPantalla('unidades')">Mis Tarjetas</a></li>
                     <li><a href="#" id="menu-historial" onclick="cambiarPantalla('historial')">Historial</a></li>
                 </ul>
-                <button onclick="cerrarSesion()" style="width: 100%; margin-top: 20px; padding: 10px; background: transparent; border: 1px solid var(--border-input); color: var(--text-muted); cursor: pointer; border-radius: 5px;">
+                <button type="button" onclick="console.log('Botón pulsado'); cerrarSesion()" style="width: 100%; margin-top: 20px; padding: 10px; background: transparent; border: 1px solid var(--border-input); color: var(--text-muted); cursor: pointer; border-radius: 5px;">
                     Cerrar Sesión
                 </button>
             </div>
