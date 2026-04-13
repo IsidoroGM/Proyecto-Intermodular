@@ -73,7 +73,8 @@
         </aside>
 
     <main class="content-area">
-        <div class="simulator-card">
+        
+        <div id="panel-simulador" class="simulator-card pantalla-activa">
             <div class="card-header">
                 <h2>Configuración de Ataque</h2>
                 <p>Introduce los atributos de la unidad atacante y defensora.</p>
@@ -162,16 +163,121 @@
             </div>
         </div>
 
-        <div id="contenedorResultados" class="results-area">
-    </div>
+        <div id="contenedorResultados" class="results-area" style="display: none;"></div>
 
-    <div id="panel-guardar-tirada" class="pantalla-oculta" style="margin-top: 20px; padding: 15px; background: var(--bg-panels); border: 1px solid var(--accent); border-radius: 5px;">
-        <h4 style="color: var(--accent); margin-bottom: 10px;">¿Guardar este resultado?</h4>
-        <input type="text" id="save-titulo" placeholder="Título (ej: Carga de Exterminadores)" style="width: 100%; margin-bottom: 10px; padding: 8px;">
-        <textarea id="save-notas" placeholder="Notas adicionales..." style="width: 100%; height: 60px; margin-bottom: 10px; padding: 8px; background: var(--bg-main); color: white; border: 1px solid var(--border-input);"></textarea>
-        <button onclick="enviarGuardado()" class="btn-primary" style="height: 35px; font-size: 0.8em;">Confirmar Guardado</button>
-    </div>
+        <div id="panel-guardar-tirada" class="pantalla-oculta" style="margin-top: 20px; padding: 15px; background: var(--bg-panels); border: 1px solid var(--accent); border-radius: 5px;">
+            <h4 style="color: var(--accent); margin-bottom: 10px;">¿Guardar este resultado?</h4>
+            <input type="text" id="save-titulo" placeholder="Título (ej: Carga de Exterminadores)" style="width: 100%; margin-bottom: 10px; padding: 8px;">
+            <textarea id="save-notas" placeholder="Notas adicionales..." style="width: 100%; height: 60px; margin-bottom: 10px; padding: 8px; background: var(--bg-main); color: white; border: 1px solid var(--border-input);"></textarea>
+            <button onclick="enviarGuardado()" class="btn-primary" style="height: 35px; font-size: 0.8em;">Confirmar Guardado</button>
+        </div>
+
+
+        <div id="panel-unidades" class="simulator-card pantalla-oculta">
+            <div class="card-header">
+                <h2>Armería: Mis Hojas de Datos</h2>
+                <p>Registra y gestiona tus unidades para desplegarlas rápidamente en el simulador.</p>
+            </div>
+
+            <div class="card-body">
+                <fieldset class="step-group">
+                    <legend>Registrar Nueva Unidad</legend>
+                    <div class="input-grid">
+                        
+                        <div class="field" style="grid-column: 1 / -1;">
+                            <label>Nombre de la Unidad</label>
+                            <input type="text" id="nueva-unidad-nombre" placeholder="Ej: Exterminadores de Asalto">
+                        </div>
+
+                        <div class="field">
+                            <label>Nº Ataques</label>
+                            <input type="number" id="nueva-unidad-ataques" value="1" min="1">
+                        </div>
+                        <div class="field">
+                            <label>Daño por Ataque</label>
+                            <input type="number" id="nueva-unidad-dano" value="1" min="1">
+                        </div>
+
+                        <div class="field">
+                            <label>Impactar a (X+)</label>
+                            <input type="number" id="nueva-unidad-impacto" value="3" min="1" max="6">
+                        </div>
+                        <div class="field">
+                            <label>Repetir Impactos</label>
+                            <select id="nueva-unidad-rep-impacto">
+                                <option value="NONE">No repetir</option>
+                                <option value="ONES">Repetir 1s</option>
+                                <option value="ALL">Repetir fallos</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>Regla Especial 6s</label>
+                            <select id="nueva-unidad-esp-impacto">
+                                <option value="NONE">Ninguna</option>
+                                <option value="EXTRA_HIT">Impacto Extra</option>
+                                <option value="AUTO_WOUND">Herida Automática</option>
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label>Herir a (X+)</label>
+                            <input type="number" id="nueva-unidad-herir" value="4" min="2" max="6">
+                        </div>
+                        <div class="field">
+                            <label>Repetir Heridas</label>
+                            <select id="nueva-unidad-rep-herir">
+                                <option value="NONE">No repetir</option>
+                                <option value="ONES">Repetir 1s</option>
+                                <option value="ALL">Repetir fallos</option>
+                            </select>
+                        </div>
+                        <div class="field checkbox-container">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="nueva-unidad-devastadoras">
+                                <span>Heridas Devastadoras</span>
+                            </label>
+                        </div>
+
+                        <div class="field">
+                            <label>Salvación rival (X+)</label>
+                            <input type="number" id="nueva-unidad-salvacion" value="5" min="2" max="7">
+                        </div>
+                        <div class="field">
+                            <label>No Hay Dolor rival (X+)</label>
+                            <input type="number" id="nueva-unidad-fnp" value="0">
+                        </div>
+
+                        <div class="field" style="grid-column: 1 / -1;">
+                            <label>Notas tácticas o reglas especiales</label>
+                            <textarea id="nueva-unidad-notas" placeholder="Añade aquí habilidades, auras..."></textarea>
+                        </div>
+
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="card-footer" style="border-bottom: 1px solid var(--border-dark); margin-bottom: 20px;">
+                <button class="btn-primary" onclick="guardarNuevaUnidad()">
+                    Guardar en Armería
+                </button>
+            </div>
+
+            <div class="card-body">
+                <h3 style="color: var(--text-main); margin-bottom: 15px; text-transform: uppercase; font-size: 0.9em; letter-spacing: 1px;">Unidades Desplegables</h3>
+                <div id="lista-tarjetas-unidad" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;">
+                    </div>
+            </div>
+        </div>
+
+        <div id="panel-historial" class="pantalla-oculta" style="padding: 20px;">
+            <h2 style="color: var(--accent); margin-bottom: 20px;">Archivos de Batalla: Historial</h2>
+            <div id="historial-completo">
+                <p style="color: var(--text-muted);">El historial se cargará aquí próximamente...</p>
+            </div>
+        </div>
+
     </main>
+    
 
     <aside class="sidebar right-sidebar">
         <h3>Resumen Rápido</h3>

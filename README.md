@@ -1,108 +1,115 @@
-********************
-* WAR - METRICS *
-********************
+# ⚡ WarMetrics: Precision Strike Simulator
+> **Plataforma Full-Stack de simulación táctica y gestión de unidades para Wargames.**
 
-WAR - METRICS (V1.0) es una aplicación web *Full Stack* diseñada para actuar como un motor de resolución estadística y simulador de combate para juegos de miniaturas y *wargames*.
+[![Java](https://img.shields.io/badge/Java-17+-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.x-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/es/docs/Web/JavaScript)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![Estilo](https://img.shields.io/badge/UI/UX-Cyberpunk_Neon-00ff9f?style=for-the-badge)](#)
 
-La herramienta permite introducir perfiles de ataque complejos y devuelve tanto el resultado de una simulación aleatoria (tirada de dados virtual) como la media estadística real (conocida en la comunidad como *MathHammer*).
+---
 
-## ✨ Características Principales
+## 🎯 Visión General
 
-* **Secuencia de Combate Completa**: Simula de forma concatenada las fases de Impactar, Herir, Salvación por Armadura y No Hay Dolor (FNP).
-* **Motor Dual de Cálculo**: 
-  * *Simulación Aleatoria*: Utiliza `ThreadLocalRandom` para tirar dados virtuales.
-  * *Media Matemática*: Calcula la esperanza matemática exacta basada en probabilidades ponderadas.
-* **Reglas Especiales Integradas**:
-  * Repeticiones al impactar/herir (repetir los 1s o repetir todos los fallos).
-  * Reglas de críticos (6s naturales): Generar impactos adicionales, herir automáticamente o ignorar la salvación por armadura (heridas insalvables).
-* **Interfaz de Usuario (UI)**: Dashboard responsivo construido en HTML/CSS y Vanilla JavaScript que interactúa de forma asíncrona con el servidor.
+**WarMetrics** no es solo una calculadora; es una Single Page Application (SPA) diseñada para optimizar la toma de decisiones estratégicas en juegos de miniaturas. Combina un **potente motor de cálculo probabilístico** con un sistema de gestión de inventario táctico, permitiendo a los comandantes prever resultados con precisión matemática antes de desplegar sus tropas.
 
-## 🛠️ Stack Tecnológico
+### 🖼️ Preview del Campo de Batalla
+*(Inserta aquí tus capturas de pantalla para impresionar a los recruiters)*
+> `![Simulador Principal](assets/simulador_view.png)`  
+> `![Armería de Unidades](assets/armeria_view.png)`
 
-**Backend:**
-* Java (JDK 17/21)
-* Spring Boot (Web, REST API)
-* Maven (Gestor de dependencias)
+---
 
-**Frontend:**
-* HTML5 & CSS3 (Diseño responsivo con CSS Grid/Flexbox)
-* Vanilla JavaScript (Fetch API para peticiones asíncronas)
+## 🛠️ Ingeniería de Software (Core Features)
 
-## 🏗️ Arquitectura del Proyecto
+### 1. Motor de Simulación Dual (Double Engine)
+A diferencia de simuladores básicos, WarMetrics implementa un sistema de análisis doble:
+* **Algoritmo de Montecarlo (Random):** Simula tiradas de dados reales procesando cada fase del combate (Impacto, Herida, Salvación, No Hay Dolor).
+* **Motor de MathHammer (Estadístico):** Ejecuta cálculos de probabilidad en cascada para devolver la esperanza matemática de daño, permitiendo comparar la "suerte" frente a la "media".
 
-El proyecto sigue una estructura limpia basada en capas (MVC/REST):
+### 2. La Armería (CRUD & Persistent Data)
+Gestión completa de hojas de datos con persistencia en base de datos relacional:
+* **Perfil Táctico Completo:** Almacenamiento de atributos complejos (Nº ataques, Impacto a X+, reglas de repetición de 1s o fallos, reglas especiales en 6s como *Impactos Extra* o *Heridas Automáticas*).
+* **Auto-Equipamiento (One-Click Deploy):** Integración fluida mediante JSON. Al seleccionar una unidad, el frontend inyecta instantáneamente el objeto de datos en el simulador, eliminando el error humano y acelerando el flujo de trabajo.
 
-* `Controller` (`AtaqueController`): Expone la API REST, versionada en `v1`, configurada con `@CrossOrigin` para permitir la comunicación fluida con el cliente.
-* `Service` (`SimuladorService`): El "cerebro" de la aplicación. Contiene la lógica de negocio, bucles de simulación y las matemáticas de probabilidad.
-* `DTO` (`AtaqueRequest`, `ResultadoResponse`): Objetos de transferencia de datos para tipar fuertemente las entradas y salidas de la API.
+### 3. Ecosistema de Usuario & Seguridad
+* **Autenticación de Sesión:** Sistema de login/registro con control de acceso a funciones persistentes.
+* **Historial de Batalla:** Registro cronológico de simulaciones para análisis post-partida.
 
+---
 
-## 📡 API REST Endpoints
-La aplicación expone los siguientes endpoints:
+## 🏗️ Arquitectura Técnica
 
-### 1. Comprobación de Estado (Health Check)
-```http
-GET /api/v1/combate/status
+El proyecto sigue una arquitectura **Client-Server** limpia, separando responsabilidades para garantizar la escalabilidad:
 
-### 2. Simulación de Combate
-```http
-POST /api/v1/combate/simular
+### Backend (Spring Boot 3)
+* **REST API:** Endpoints estructurados siguiendo el estándar de la industria.
+* **Persistence Layer:** Spring Data JPA + Hibernate para una gestión eficiente de la base de datos.
+* **Data Integrity:** Uso de **DTOs (Data Transfer Objects)** para la comunicación segura entre capas, protegiendo las entidades del dominio.
+* **Lógica de Negocio:** Servicios desacoplados que procesan reglas de combate complejas (Heridas Devastadoras, Salvaciones Invulnerables, etc.).
 
-Cuerpo de la petición (JSON):
+### Frontend (SPA & Cyberpunk UI)
+* **Vanilla Stack:** HTML5, CSS3 y JavaScript ES6+. Sin frameworks pesados para demostrar dominio absoluto del DOM.
+* **Asynchronous UX:** Comunicación fluida con el servidor mediante `fetch()` y promesas, evitando recargas de página.
+* **Custom UI:** Diseño de vanguardia con estética "Glow Neón" basado en variables CSS dinámicas y layouts de CSS Grid/Flexbox.
 
-{
-    "numAtaques": 10,
-    "dañoPorAtaque": 2,
-    "impactoX": 3,
-    "repeticionImpacto": "ONES", 
-    "especialSeisImpacto": "AUTO_WOUND", 
-    "herirX": 4,
-    "repeticionHerir": "NONE",
-    "seisHeridaInsalvable": true,
-    "salvacionX": 4,
-    "noHayDolorX": 6
-}
+---
 
-## Notas sobre parámetros: repeticion acepta "NONE", "ONES" o "ALL". especialSeisImpacto acepta "NONE", "EXTRA_HIT" o "AUTO_WOUND".
+## 💻 Stack Tecnológico
 
-Respuesta (JSON):
+| Capa | Tecnologías |
+| :--- | :--- |
+| **Lenguaje** | Java 17, JavaScript (ES6) |
+| **Frameworks** | Spring Boot 3.2, Spring Data JPA |
+| **Base de Datos** | MySQL / PostgreSQL |
+| **Herramientas** | Maven, Git, IntelliJ IDEA |
+| **Frontend** | CSS Grid, Flexbox, UI Responsiva |
 
-{
-    "dañoAleatorio": 8,
-    "dañoMedioEstadistico": 7.41
-}
+---
 
-🚀 Instalación y Ejecución Local
-1. Clona este repositorio en tu máquina local.
+## 🚀 Guía de Despliegue Rápido
 
-2. Asegúrate de tener Java y Maven instalados.
+### Requisitos
+* Java JDK 17 o superior.
+* Maven 3.6+.
+* MySQL 8.0.
 
-3. Abre una terminal en la raíz del proyecto y ejecuta:
+### Instalación
+1.  **Clonación del Cuartel General:**
+    ```bash
+    git clone [https://github.com/tu-usuario/WarMetrics.git](https://github.com/tu-usuario/WarMetrics.git)
+    cd WarMetrics
+    ```
+2.  **Configuración de Suministros (BBDD):**
+    Edita `src/main/resources/application.properties` con tus credenciales:
+    ```properties
+    spring.datasource.url=jdbc:mysql://localhost:3306/warmetrics
+    spring.datasource.username=tu_usuario
+    spring.datasource.password=tu_contraseña
+    ```
+3.  **Despliegue del Servidor:**
+    ```bash
+    mvn spring-boot:run
+    ```
+4.  **Acceso:** Abre `http://localhost:8080` en tu navegador.
 
-    ./mvnw spring-boot:run
+---
 
-4. Una vez que la consola indique que la aplicación ha arrancado (Started Proyecto1Application), abre tu navegador web favorito.
+## 🗺️ Roadmap de Operaciones
 
-5. Navega a la siguiente dirección para usar la interfaz gráfica:
+- [x] **Fase 1:** Motor de cálculo básico y diseño UI neón.
+- [x] **Fase 2:** Sistema de usuarios y persistencia de tiradas.
+- [x] **Fase 3:** Armería interactiva con auto-equipamiento de unidades.
+- [ ] **Fase 4 (Inminente):** Implementación de **JWT (JSON Web Tokens)** para seguridad de grado industrial.
+- [ ] **Fase 5:** Sistema de notificaciones tipo Toast y animaciones de dados mediante Canvas/Three.js.
 
-    http://localhost:8080/index.html
+---
 
+## 👤 Autor
+**[TU NOMBRE]** *Full Stack Developer Junior* > Apasionado por la resolución de problemas lógicos y la creación de interfaces de usuario inmersivas.
 
-🗺️ Roadmap (Próximos Pasos)
-La versión actual es puramente computacional. Las futuras iteraciones de WarMetrics incluirán:
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=flat&logo=linkedin&logoColor=white)](TU_LINKEDIN)
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=flat&logo=github&logoColor=white)](TU_GITHUB)
 
-[ ] Capa de Persistencia: Integración de Base de Datos (MySQL/PostgreSQL) mediante Spring Data JPA.
-
-[ ] Sistema de Usuarios: Registro, Autenticación y Autorización mediante Spring Security y JWT.
-
-[ ] Historial: Capacidad para guardar los resultados de las simulaciones asociadas a un usuario con títulos y notas personalizadas.
-
-------------------------------------------------------
-
-Desarrollado con pasión para la comunidad de Wargames.
-
-------------------------------------------------------
-
-***
-
-Con este documento, cualquier persona (o reclutador) que visite tu código entenderá perfectamente la magnitud del trabajo, las decisiones técnicas que has tomado y hacia dónde se dirige el proyecto.
+---
+*Construido con precisión estratégica. WarMetrics v1.0 - 2024.*
