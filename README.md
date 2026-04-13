@@ -14,7 +14,6 @@
 **WarMetrics** no es solo una calculadora; es una Single Page Application (SPA) diseñada para optimizar la toma de decisiones estratégicas en juegos de miniaturas. Combina un **potente motor de cálculo probabilístico** con un sistema de gestión de inventario táctico, permitiendo a los comandantes prever resultados con precisión matemática antes de desplegar sus tropas.
 
 ### 🖼️ Preview del Campo de Batalla
-*(Inserta aquí tus capturas de pantalla para impresionar a los recruiters)*
 > `![Simulador Principal](assets/simulador_view.png)`  
 > `![Armería de Unidades](assets/armeria_view.png)`
 
