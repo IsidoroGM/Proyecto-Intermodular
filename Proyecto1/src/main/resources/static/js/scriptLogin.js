@@ -85,23 +85,30 @@ function cerrarSesion() {
 
 // 5. Actualizar la interfaz 
 function actualizarInterfazAuth() {
+    // 1. Buscamos los elementos exactos que existen en tu HTML
     const authPanel = document.getElementById('auth-panel');
     const userPanel = document.getElementById('user-panel');
-    const msj = document.getElementById('auth-mensaje');
-    
+    const bienvenidaUsuario = document.getElementById('bienvenida-usuario');
+
     if (usuarioActual) {
         // --- ESTADO: LOGUEADO ---
-        document.getElementById('bienvenida-usuario').innerText = `Hola, ${usuarioActual.username}`;
-        
-        // INTERCAMBIO VISUAL TOTAL (Modo seguro)
         authPanel.classList.remove('pantalla-activa');
         authPanel.classList.add('pantalla-oculta');
         
         userPanel.classList.remove('pantalla-oculta');
         userPanel.classList.add('pantalla-activa');
         
-        if (msj) msj.innerText = '';
-        console.log("Sistema: Panel de acceso oculto. Panel de usuario activo.");
+        // 2. Cambiamos el texto del H3 con el nombre del usuario
+        if (bienvenidaUsuario) {
+            bienvenidaUsuario.innerText = `Hola, ${usuarioActual.username}`;
+        }
+        
+        // 3. Guardamos sesión
+        localStorage.setItem('warmetrics_user', JSON.stringify(usuarioActual));
+
+        // 4. Cargamos los datos del backend
+        if (typeof cargarTarjetasUnidad === 'function') cargarTarjetasUnidad();
+        if (typeof cargarHistorialVisual === 'function') cargarHistorialVisual();
 
     } else {
         // --- ESTADO: NO LOGUEADO ---
@@ -110,10 +117,6 @@ function actualizarInterfazAuth() {
         
         userPanel.classList.remove('pantalla-activa');
         userPanel.classList.add('pantalla-oculta');
-        
-        if (typeof cambiarPantalla === "function") {
-            cambiarPantalla('simulador'); 
-        }
     }
 }
 

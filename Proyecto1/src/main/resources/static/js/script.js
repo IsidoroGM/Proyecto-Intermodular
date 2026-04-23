@@ -1,19 +1,21 @@
+// --- VARIABLES GLOBALES ---
 let ultimoResultado = null; // Guardará el último cálculo hecho
 
 /**
- * Función principal para ejecutar la simulación de combate.
+ * 1. SIMULADOR: Ejecuta la simulación enviando los datos al backend
  */
 async function ejecutarSimulacion() {
+    // Recolección de datos del formulario principal
     const payload = {
-        numAtaques: parseInt(document.getElementById('numAtaques').value),
-        dañoPorAtaque: parseInt(document.getElementById('dañoPorAtaque').value),
-        impactoX: parseInt(document.getElementById('impactoX').value),
+        numAtaques: parseInt(document.getElementById('numAtaques').value) || 0,
+        dañoPorAtaque: parseInt(document.getElementById('dañoPorAtaque').value) || 0,
+        impactoX: parseInt(document.getElementById('impactoX').value) || 0,
         repeticionImpacto: document.getElementById('repeticionImpacto').value,
         especialSeisImpacto: document.getElementById('especialSeisImpacto').value,
-        herirX: parseInt(document.getElementById('herirX').value),
+        herirX: parseInt(document.getElementById('herirX').value) || 0,
         repeticionHerir: document.getElementById('repeticionHerir').value, 
         seisHeridaInsalvable: document.getElementById('seisHeridaInsalvable').checked,
-        salvacionX: parseInt(document.getElementById('salvacionX').value),
+        salvacionX: parseInt(document.getElementById('salvacionX').value) || 0,
         noHayDolorX: parseInt(document.getElementById('noHayDolorX').value || 0)
     };
 
@@ -26,58 +28,73 @@ async function ejecutarSimulacion() {
             body: JSON.stringify(payload)
         });
 
-        if (!response.ok) throw new Error("Error en el servidor");
+        if (!response.ok) throw new Error("Error en la respuesta del servidor");
 
         const data = await response.json(); 
         
-        // 1. GUARDAMOS EL RESULTADO EN LA MEMORIA
-        ultimoResultado = data; 
+        // Persistencia temporal para el guardado posterior
+        ultimoResultado = {
+            dañoAleatorio: data.heridasFinalesAleatorias || data.dañoAleatorio,
+            dañoMedioEstadistico: data.heridasFinalesEstadisticas || data.dañoMedioEstadistico
+        };
 
-        // 2. MOSTRAMOS EL PANEL DE GUARDAR (Solo si hay usuario conectado)
-        if (typeof usuarioActual !== 'undefined' && usuarioActual !== null) {
-            const panelGuardar = document.getElementById('panel-guardar-tirada');
-            if (panelGuardar) {
-                panelGuardar.classList.remove('pantalla-oculta');
-                panelGuardar.classList.add('pantalla-activa');
-                panelGuardar.style.display = 'block'; // Aseguramos que se vea
-            }
-        }
-        
-        // 3. Mostramos resultados centrales
+        // Actualización de la Interfaz (Resultados Centrales)
         contenedor.style.display = 'flex';
         contenedor.innerHTML = `
             <div class="caja-resultado aleatorio">
-                🎲 Tirada de dados: <strong>${data.dañoAleatorio}</strong> daños realizados
+                🎲 Tirada de dados: <strong>${ultimoResultado.dañoAleatorio}</strong> daños realizados
             </div>
             <div class="caja-resultado estadistica">
-                📊 Media (MathHammer): <strong>${data.dañoMedioEstadistico}</strong> daños esperados
+                📊 Media (MathHammer): <strong>${ultimoResultado.dañoMedioEstadistico}</strong> daños esperados
             </div>
         `;
 
-        // 4. Añadimos al Resumen Rápido
-        const quickStats = document.getElementById('quick-stats');
-        if (quickStats) {
-            const nuevaEntrada = document.createElement('div');
-            nuevaEntrada.style.padding = "10px";
-            nuevaEntrada.style.borderBottom = "1px solid var(--border-dark)";
-            nuevaEntrada.style.fontSize = "0.85rem";
-            nuevaEntrada.innerHTML = `
-                <strong>Ataque:</strong> ${payload.numAtaques} dados<br>
-                <strong>Resultado:</strong> <span style="color:var(--accent)">${data.dañoAleatorio}</span> | <strong>Media:</strong> ${data.dañoMedioEstadistico}
-            `;
-            quickStats.prepend(nuevaEntrada);
-            const placeholder = quickStats.querySelector('p');
-            if (placeholder) placeholder.remove();
-        }
+        actualizarResumenRapido(payload, ultimoResultado);
+        gestionarPanelGuardado();
 
     } catch (error) {
+        console.error('Error durante la simulación:', error);
         contenedor.style.display = 'flex';
-        contenedor.innerHTML = `<div class="caja-resultado error">⚠️ Error de conexión.</div>`;
+        contenedor.innerHTML = `<div class="caja-resultado error">⚠️ Error de conexión con el motor de combate.</div>`;
     }
 }
 
 /**
- * Verificación del estado del servidor
+ * 2. FUNCIONES AUXILIARES DEL SIMULADOR
+ */
+function gestionarPanelGuardado() {
+    // Validamos que usuarioActual exista y esté logueado
+    if (typeof usuarioActual !== 'undefined' && usuarioActual !== null) {
+        const panelGuardar = document.getElementById('panel-guardar-tirada');
+        if (panelGuardar) {
+            panelGuardar.classList.remove('pantalla-oculta');
+            panelGuardar.classList.add('pantalla-activa');
+            panelGuardar.style.display = 'block'; 
+        }
+    }
+}
+
+function actualizarResumenRapido(payload, resultado) {
+    const quickStats = document.getElementById('quick-stats');
+    if (quickStats) {
+        const nuevaEntrada = document.createElement('div');
+        nuevaEntrada.className = "resumen-entrada"; 
+        nuevaEntrada.style.padding = "10px";
+        nuevaEntrada.style.borderBottom = "1px solid var(--border-dark)";
+        nuevaEntrada.style.fontSize = "0.85rem";
+        nuevaEntrada.innerHTML = `
+            <strong>Ataque:</strong> ${payload.numAtaques} dados<br>
+            <strong>Resultado:</strong> <span style="color:var(--accent)">${resultado.dañoAleatorio}</span> | <strong>Media:</strong> ${resultado.dañoMedioEstadistico}
+        `;
+        quickStats.prepend(nuevaEntrada);
+        
+        const placeholder = quickStats.querySelector('p');
+        if (placeholder) placeholder.remove();
+    }
+}
+
+/**
+ * 3. VERIFICACIÓN DE ESTADO DEL SERVIDOR
  */
 window.onload = async function() {
     try {
@@ -97,86 +114,69 @@ window.onload = async function() {
 };
 
 /**
- * GESTIÓN DE PANTALLAS: Navegación unificada y a prueba de errores
+ * 4. NAVEGACIÓN ENTRE PANTALLAS
  */
 function cambiarPantalla(destino) {
-    // 1. Obtener los elementos principales del DOM
-    const panelSimulador = document.getElementById('panel-simulador');
-    const panelUnidades = document.getElementById('panel-unidades');
-    const panelHistorial = document.getElementById('panel-historial');
-    const resultados = document.getElementById('contenedorResultados');
-    const guardarTirada = document.getElementById('panel-guardar-tirada');
+    console.log("Navegando hacia:", destino); 
 
-    // 2. Apagar TODOS los paneles por defecto (Forzamos ocultarlos)
-    if (panelSimulador) {
-        panelSimulador.classList.remove('pantalla-activa');
-        panelSimulador.classList.add('pantalla-oculta');
-        panelSimulador.style.display = 'none'; 
-    }
-    if (panelUnidades) {
-        panelUnidades.classList.remove('pantalla-activa');
-        panelUnidades.classList.add('pantalla-oculta');
-        panelUnidades.style.display = 'none';
-    }
-    if (panelHistorial) {
-        panelHistorial.classList.remove('pantalla-activa');
-        panelHistorial.classList.add('pantalla-oculta');
-        panelHistorial.style.display = 'none';
-    }
-    
-    // Ocultar también los resultados de los dados si cambiamos de pestaña
-    if (resultados) resultados.style.display = 'none';
-    if (guardarTirada) guardarTirada.style.display = 'none';
-
-    // 3. Encender SOLO el panel al que queremos ir
-    const panelDestino = document.getElementById(`panel-${destino}`);
-    if (panelDestino) {
-        panelDestino.classList.remove('pantalla-oculta');
-        panelDestino.classList.add('pantalla-activa');
-        panelDestino.style.display = 'block'; 
-    }
-
-    // 4. Acciones específicas si entramos a una pestaña concreta
-    if (destino === 'unidades') {
-        cargarTarjetasUnidad();
-    }
-
-    // 5. Cambiar el color "Activo" en el menú lateral izquierdo
-    document.querySelectorAll('.sidebar ul li a').forEach(enlace => {
-        enlace.classList.remove('active');
+    // Ocultar todas las pantallas
+    const pantallas = ['pantalla-simulador', 'pantalla-unidades', 'pantalla-historial'];
+    pantallas.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.classList.remove('pantalla-activa');
+            el.classList.add('pantalla-oculta');
+        }
     });
-    
-    const menuActivo = document.getElementById('menu-' + destino);
-    if (menuActivo) {
-        menuActivo.classList.add('active');
+
+    // Desactivar botones del menú
+    document.querySelectorAll('.sidebar ul li a').forEach(el => {
+        el.classList.remove('active');
+    });
+
+    // Activar pantalla destino
+    const pantallaDestino = document.getElementById(`pantalla-${destino}`);
+    const menuDestino = document.getElementById(`menu-${destino}`);
+
+    if (pantallaDestino) {
+        pantallaDestino.classList.remove('pantalla-oculta');
+        pantallaDestino.classList.add('pantalla-activa');
+    }
+
+    if (menuDestino) {
+        menuDestino.classList.add('active');
+    }
+
+    // Cargar datos si el usuario está logueado (Nombres corregidos)
+    if (typeof usuarioActual !== 'undefined' && usuarioActual !== null) {
+        if (destino === 'unidades') cargarTarjetasUnidad();
+        if (destino === 'historial' && typeof cargarHistorialVisual === 'function') {
+            cargarHistorialVisual(); // Asume que está en scriptGuardadoHistorial.js
+        }
     }
 }
 
-// --- GESTIÓN DE MIS UNIDADES (TARJETAS) ---
+/**
+ * 5. GESTIÓN DE LA ARMERÍA (TARJETAS DE UNIDAD)
+ */
 
-// 1. Guardar nueva unidad
+// Guardar nueva unidad
 async function guardarNuevaUnidad() {
-    if (!usuarioActual) return alert("Debes iniciar sesión para guardar unidades.");
+    if (typeof usuarioActual === 'undefined' || !usuarioActual) return alert("Debes iniciar sesión para guardar unidades.");
 
     const nombre = document.getElementById('nueva-unidad-nombre').value;
-    if (!nombre) return alert("El nombre de la unidad es obligatorio.");
+    if (!nombre) return alert("El nombre de la unidad es obligatorio para los archivos.");
 
     const payload = {
         usuarioId: usuarioActual.id,
         nombre: nombre,
         numAtaques: parseInt(document.getElementById('nueva-unidad-ataques').value) || 0,
         impactoX: parseInt(document.getElementById('nueva-unidad-impacto').value) || 0,
-        
-        // NUEVAS REGLAS RECOGIDAS DEL FORMULARIO
         repeticionImpacto: document.getElementById('nueva-unidad-rep-impacto').value,
         especialSeisImpacto: document.getElementById('nueva-unidad-esp-impacto').value,
-        
         herirX: parseInt(document.getElementById('nueva-unidad-herir').value) || 0,
-        
-        // NUEVAS REGLAS DE HERIDA RECOGIDAS
         repeticionHerir: document.getElementById('nueva-unidad-rep-herir').value,
         seisHeridaInsalvable: document.getElementById('nueva-unidad-devastadoras').checked,
-        
         salvacionX: parseInt(document.getElementById('nueva-unidad-salvacion').value) || 7,
         danoPorAtaque: parseInt(document.getElementById('nueva-unidad-dano').value) || 1,
         noHayDolorX: parseInt(document.getElementById('nueva-unidad-fnp').value) || 0,
@@ -191,7 +191,7 @@ async function guardarNuevaUnidad() {
         });
 
         if (response.ok) {
-            alert("Unidad guardada con éxito.");
+            alert("¡Unidad guardada con éxito en la armería!");
             
             // Limpiar formulario tras guardar
             document.getElementById('nueva-unidad-nombre').value = '';
@@ -201,60 +201,81 @@ async function guardarNuevaUnidad() {
             document.getElementById('nueva-unidad-rep-herir').value = 'NONE';
             document.getElementById('nueva-unidad-devastadoras').checked = false;
             
-            cargarTarjetasUnidad(); // Recargar la lista
+            cargarTarjetasUnidad(); // Recargar la lista visual
         } else {
-            alert("Error al guardar la unidad.");
+            alert("Error al guardar la unidad. Verifica el servidor.");
         }
     } catch (e) {
-        console.error("Error de conexión:", e);
+        console.error("Error de conexión al guardar unidad:", e);
     }
 }
 
-// 2. Cargar las unidades del usuario
+// Variable global para no perder los datos de las tarjetas
+let misTarjetasGlobal = []; 
+
+// 1. Cargar las unidades del usuario (Versión a prueba de fallos)
 async function cargarTarjetasUnidad() {
-    if (!usuarioActual) return;
-    const contenedor = document.getElementById('lista-tarjetas-unidad');
+    if (typeof usuarioActual === 'undefined' || !usuarioActual) return;
     
-    if (!contenedor) return; // Por si el contenedor no existe aún
+    const contenedor = document.getElementById('lista-tarjetas-unidad');
+    if (!contenedor) return; 
 
     try {
         const response = await fetch(`http://localhost:8080/api/tarjetas/usuario/${usuarioActual.id}`);
         const tarjetas = await response.json();
+        
+        // Guardamos las tarjetas en la variable global
+        misTarjetasGlobal = tarjetas;
 
         if (tarjetas.length === 0) {
             contenedor.innerHTML = '<p style="color: var(--text-muted);">No tienes unidades guardadas. Crea una arriba.</p>';
             return;
         }
 
-        // Dibujar las tarjetas
+        // Dibujar las tarjetas dinámicamente PASANDO SOLO EL ID (Mucho más seguro)
         contenedor.innerHTML = tarjetas.map(t => `
-            <div class="tarjeta-unidad" style="background: #222; border: 1px solid var(--accent); padding: 15px; border-radius: 5px; cursor: pointer;" 
-                 onclick='equiparUnidad(${JSON.stringify(t).replace(/'/g, "&#39;")})'>
+            <div class="tarjeta-unidad" style="background: var(--bg-panels); border: 1px solid var(--border-dark); padding: 15px; border-radius: 5px; cursor: pointer; transition: 0.3s;" 
+                 onclick="prepararEquiparUnidad(${t.id})"
+                 onmouseover="this.style.borderColor='var(--accent)'" 
+                 onmouseout="this.style.borderColor='var(--border-dark)'">
                 <h4 style="color: var(--accent); margin: 0 0 10px 0;">${t.nombre}</h4>
                 <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 10px 0;">${t.notas || 'Sin notas tácticas'}</p>
                 <div style="font-size: 0.85rem; color: #ccc;">
                     Ataques: <strong>${t.numAtaques}</strong> | Impacto: <strong>${t.impactoX}+</strong><br>
                     Herir: <strong>${t.herirX}+</strong> | Daño: <strong>${t.danoPorAtaque}</strong>
                 </div>
-                <div style="margin-top: 10px; text-align: right;">
-                    <button onclick="event.stopPropagation(); borrarTarjeta(${t.id})" style="background: transparent; border: 1px solid #e74c3c; color: #e74c3c; padding: 3px 8px; border-radius: 3px; font-size: 0.75rem; cursor: pointer;">Borrar</button>
+                <div style="margin-top: 15px; text-align: right;">
+                    <button onclick="event.stopPropagation(); borrarTarjeta(${t.id})" style="background: rgba(231, 76, 60, 0.1); border: 1px solid #e74c3c; color: #e74c3c; padding: 5px 10px; border-radius: 3px; font-size: 0.75rem; cursor: pointer;">Eliminar</button>
                 </div>
             </div>
         `).join('');
     } catch (e) {
-        console.error("Error al cargar tarjetas:", e);
+        console.error("Error al cargar las tarjetas de unidad:", e);
     }
 }
 
-// 3. LA MAGIA: Equipar la unidad en el simulador
+// 2. Función intermedia para equipar (Busca los datos de forma segura)
+function prepararEquiparUnidad(idTarjeta) {
+    const tarjeta = misTarjetasGlobal.find(t => t.id === idTarjeta);
+    if (tarjeta) {
+        equiparUnidad(tarjeta);
+    } else {
+        alert("Error al intentar recuperar los datos de la unidad.");
+    }
+}
+
+// Equipar la unidad en el simulador
 function equiparUnidad(tarjeta) {
-    // Función auxiliar para asegurarnos de que el elemento existe antes de darle valor
     const setValor = (id, valor) => {
         const elemento = document.getElementById(id);
-        if (elemento && valor !== undefined) elemento.value = valor;
+        if (elemento && valor !== undefined && valor !== null) elemento.value = valor;
     };
+    
+    const setCheck = (id, checkValue) => {
+        const elemento = document.getElementById(id);
+        if (elemento) elemento.checked = checkValue;
+    }
 
-    // Usamos los IDs exactos de tu HTML
     setValor('numAtaques', tarjeta.numAtaques);
     setValor('impactoX', tarjeta.impactoX);
     setValor('herirX', tarjeta.herirX);
@@ -262,8 +283,33 @@ function equiparUnidad(tarjeta) {
     setValor('dañoPorAtaque', tarjeta.danoPorAtaque);
     setValor('noHayDolorX', tarjeta.noHayDolorX || 0);
     
-    // Si tienes inputs para repeticiones guardadas en BBDD, se aplicarían aquí
+    // Selects
     if (tarjeta.repeticionImpacto) setValor('repeticionImpacto', tarjeta.repeticionImpacto);
     if (tarjeta.especialSeisImpacto) setValor('especialSeisImpacto', tarjeta.especialSeisImpacto);
     if (tarjeta.repeticionHerir) setValor('repeticionHerir', tarjeta.repeticionHerir);
+    
+    // Checkbox
+    if (tarjeta.seisHeridaInsalvable !== undefined) setCheck('seisHeridaInsalvable', tarjeta.seisHeridaInsalvable);
+
+    alert(`¡Unidad "${tarjeta.nombre}" lista para el combate!`);
+    cambiarPantalla('simulador');
+}
+
+// Eliminar una tarjeta (Nueva función implementada)
+async function borrarTarjeta(id) {
+    if (!confirm("Comandante, ¿está seguro de que desea eliminar esta unidad de los registros?")) return;
+    
+    try {
+        const response = await fetch(`http://localhost:8080/api/tarjetas/${id}`, { 
+            method: 'DELETE' 
+        });
+        
+        if (response.ok) {
+            cargarTarjetasUnidad(); // Recargamos para que desaparezca
+        } else {
+            alert("Los servidores de la armería denegaron la solicitud de borrado.");
+        }
+    } catch (e) {
+        console.error("Error de conexión al intentar borrar tarjeta:", e);
+    }
 }
