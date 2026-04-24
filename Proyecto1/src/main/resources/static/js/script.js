@@ -22,7 +22,8 @@ async function ejecutarSimulacion() {
     const contenedor = document.getElementById('contenedorResultados');
 
     try {
-        const response = await fetch('http://localhost:8080/api/v1/combate/simular', {
+        // CORRECCIÓN: Usamos la constante API_BASE con comillas invertidas
+        const response = await fetch(`${API_BASE}/v1/combate/simular`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -98,7 +99,8 @@ function actualizarResumenRapido(payload, resultado) {
  */
 window.onload = async function() {
     try {
-        const response = await fetch('http://localhost:8080/api/v1/combate/status'); 
+        // CORRECCIÓN: Usamos la constante API_BASE
+        const response = await fetch(`${API_BASE}/v1/combate/status`); 
         const statusElement = document.getElementById('motor-status');
         if (response.ok && statusElement) {
             statusElement.innerText = "ONLINE";
@@ -114,9 +116,19 @@ window.onload = async function() {
 };
 
 /**
- * 4. NAVEGACIÓN ENTRE PANTALLAS
+ * 4. NAVEGACIÓN ENTRE PANTALLAS (GUARDIA DE NAVEGACIÓN AÑADIDO)
  */
 function cambiarPantalla(destino) {
+    // 1. Verificar si la pantalla es protegida
+    const pantallasProtegidas = ['unidades', 'historial'];
+    const estaLogueado = (typeof usuarioActual !== 'undefined' && usuarioActual !== null && usuarioActual.id !== undefined);
+
+    if (pantallasProtegidas.includes(destino) && !estaLogueado) {
+        alert("⚠️ Acceso denegado. Debes iniciar sesión para acceder a la Armería o al Historial.");
+        // Redirigimos al simulador si intenta entrar sin permiso
+        return cambiarPantalla('simulador'); 
+    }
+
     console.log("Navegando hacia:", destino); 
 
     // Ocultar todas las pantallas
@@ -147,11 +159,11 @@ function cambiarPantalla(destino) {
         menuDestino.classList.add('active');
     }
 
-    // Cargar datos si el usuario está logueado (Nombres corregidos)
-    if (typeof usuarioActual !== 'undefined' && usuarioActual !== null) {
+    // Cargar datos si el usuario está logueado
+    if (estaLogueado) {
         if (destino === 'unidades') cargarTarjetasUnidad();
-        if (destino === 'historial' && typeof cargarHistorialVisual === 'function') {
-            cargarHistorialVisual(); // Asume que está en scriptGuardadoHistorial.js
+        if (destino === 'historial' && typeof cargarHistorialDefinitivo === 'function') {
+            cargarHistorialDefinitivo(); // NUEVO NOMBRE
         }
     }
 }
@@ -184,7 +196,8 @@ async function guardarNuevaUnidad() {
     };
 
     try {
-        const response = await fetch('http://localhost:8080/api/tarjetas/guardar', {
+        // CORRECCIÓN: Usamos la constante API_BASE
+        const response = await fetch(`${API_BASE}/tarjetas/guardar`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -221,7 +234,8 @@ async function cargarTarjetasUnidad() {
     if (!contenedor) return; 
 
     try {
-        const response = await fetch(`http://localhost:8080/api/tarjetas/usuario/${usuarioActual.id}`);
+        // CORRECCIÓN: Usamos la constante API_BASE
+        const response = await fetch(`${API_BASE}/tarjetas/usuario/${usuarioActual.id}`);
         const tarjetas = await response.json();
         
         // Guardamos las tarjetas en la variable global
@@ -300,7 +314,8 @@ async function borrarTarjeta(id) {
     if (!confirm("Comandante, ¿está seguro de que desea eliminar esta unidad de los registros?")) return;
     
     try {
-        const response = await fetch(`http://localhost:8080/api/tarjetas/${id}`, { 
+        // CORRECCIÓN: Usamos la constante API_BASE
+        const response = await fetch(`${API_BASE}/tarjetas/${id}`, { 
             method: 'DELETE' 
         });
         

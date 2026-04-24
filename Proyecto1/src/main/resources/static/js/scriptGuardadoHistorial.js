@@ -2,37 +2,25 @@
 // WAR-METRICS: SISTEMA DE ARCHIVOS Y RUTINAS DE HISTORIAL
 // =======================================================
 
-/**
- * 1. GUARDAR TIRADA EN EL SERVIDOR
- * Recoge los datos del panel, los cruza con el último cálculo
- * y los envía al HistorialController.
- */
 async function enviarGuardado() {
     const titulo = document.getElementById('save-titulo').value;
     const notas = document.getElementById('save-notas').value;
 
-    // Validaciones de seguridad
-    if (!titulo) {
-        alert("Comandante, por favor asigne un título al archivo de batalla.");
-        return;
-    }
+    if (!titulo) return alert("Comandante, por favor asigne un título al archivo de batalla.");
+    if (!ultimoResultado) return alert("Error: No hay datos en el motor de simulación para guardar.");
+    if (typeof usuarioActual === 'undefined' || !usuarioActual) return alert("Debes iniciar sesión para guardar en los archivos.");
 
-    if (!ultimoResultado) {
-        alert("Error: No hay datos en el motor de simulación para guardar.");
-        return;
-    }
-
-    // Preparar el paquete de datos (Debe coincidir con GuardarTiradasRequest.java)
     const payload = {
         usuarioId: usuarioActual.id,
         titulo: titulo,
         notas: notas,
-        aleatorio: ultimoResultado.dañoAleatorio,
-        media: ultimoResultado.dañoMedioEstadistico
+        aleatorio: ultimoResultado.dañoAleatorio || ultimoResultado.danoAleatorio, 
+        media: ultimoResultado.dañoMedioEstadistico || ultimoResultado.danoMedioEstadistico
     };
 
     try {
-        const response = await fetch('http://localhost:8080/api/historial/guardar', {
+        // Usamos la constante API_BASE centralizada
+        const response = await fetch(`${API_BASE}/historial/guardar`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -41,55 +29,48 @@ async function enviarGuardado() {
         if (response.ok) {
             alert(`¡Archivo "${titulo}" guardado en los registros!`);
             
-            // Ocultamos el panel de guardado de forma robusta
             const panelGuardar = document.getElementById('panel-guardar-tirada');
             if (panelGuardar) {
                 panelGuardar.classList.remove('pantalla-activa');
                 panelGuardar.classList.add('pantalla-oculta');
-                panelGuardar.style.display = 'none'; // Clave para evitar el bug visual
+                panelGuardar.style.display = 'none'; 
             }
             
-            // Limpiamos los inputs
             document.getElementById('save-titulo').value = '';
             document.getElementById('save-notas').value = '';
             
-            // Refrescamos la pestaña historial si el usuario decide ir allí
-            if (typeof cargarHistorialVisual === 'function') {
-                cargarHistorialVisual(); 
-            }
+            if (typeof cargarHistorialDefinitivo === 'function') cargarHistorialDefinitivo(); 
         } else {
-            alert("Los servidores de registro han rechazado la petición.");
+            alert("Los servidores de registro han rechazado la petición. Revisa tu conexión.");
         }
     } catch (e) {
-        console.error("Error al guardar historial:", e);
-        alert("Pérdida de conexión con el servidor. No se pudo guardar.");
+        console.error("Error de conexión al guardar historial:", e);
+        alert("Fallo de comunicación con la base de datos imperial.");
     }
 }
 
-/**
- * 2. RECUPERAR Y PINTAR EL HISTORIAL DEL USUARIO
- * Llama al backend para traer los registros y genera las tarjetas.
- */
-async function cargarHistorialVisual() {
+async function cargarHistorialDefinitivo() {
     if (typeof usuarioActual === 'undefined' || !usuarioActual) return;
 
     const lista = document.getElementById('historial-completo');
     if (!lista) return; 
 
     try {
-        const response = await fetch(`http://localhost:8080/api/historial/usuario/${usuarioActual.id}`);
+        // Usamos la constante API_BASE centralizada
+        const response = await fetch(`${API_BASE}/historial/usuario/${usuarioActual.id}`);
+        
+        if (!response.ok) throw new Error("Error al descargar los archivos");
+        
         const tiradas = await response.json();
 
-        // Si no hay tiradas, mostramos mensaje elegante
         if (tiradas.length === 0) {
             lista.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-style: italic;">Los archivos están vacíos. Realiza tu primera tirada en el simulador.</p>';
             return;
         }
 
-        // Renderizado del historial (con clases dinámicas y coincidiendo con el modelo Java)
         lista.innerHTML = tiradas.map(t => {
-            // Manejo de fecha seguro
             const fechaString = new Date(t.fechaCreacion).toLocaleString();
+            const notasHTML = t.notas ? 'Notas: <i>' + t.notas + '</i>' : 'Sin notas tácticas adjuntas.';
             
             return `
             <div class="historial-card" style="border: 1px solid var(--border-dark); padding: 15px; margin-bottom: 15px; border-radius: 5px; background: var(--bg-panels); transition: 0.3s;"
@@ -102,20 +83,46 @@ async function cargarHistorialVisual() {
                 </div>
                 
                 <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0 0 15px 0;">
-                    ${t.notas ? `📝 <i>${t.notas}</i>` : 'Sin notas tácticas adjuntas.'}
+                    ${notasHTML}
                 </p>
                 
-                <div style="display: flex; gap: 15px; font-size: 0.95rem; color: var(--text-main); background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px;">
-                    <div>🎲 Resultado Real: <strong style="color: #2ecc71;">${t.danoAleatorio}</strong></div>
-                    <div>|</div>
-                    <div>📊 Media (MathHammer): <strong style="color: #3498db;">${t.danoMedioEstadistico}</strong></div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; gap: 15px; font-size: 0.95rem; color: var(--text-main); background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px;">
+                        <div>Dado: <strong style="color: #2ecc71;">${t.danoAleatorio}</strong></div>
+                        <div>|</div>
+                        <div>Media: <strong style="color: #3498db;">${t.danoMedioEstadistico}</strong></div>
+                    </div>
+                    
+                    <button onclick="borrarTirada(${t.id})" style="background: rgba(231, 76, 60, 0.1); border: 1px solid #e74c3c; color: #e74c3c; padding: 5px 15px; border-radius: 3px; cursor: pointer; transition: 0.2s;">
+                        Purgar Archivo
+                    </button>
                 </div>
             </div>
             `;
         }).join('');
         
     } catch (e) {
-        console.error("Error al recuperar los archivos de batalla:", e);
-        lista.innerHTML = '<p style="text-align:center; color:#e74c3c;">Fallo en la conexión con los archivos imperiales.</p>';
+        console.error("Error al recuperar los archivos:", e);
+        lista.innerHTML = '<p style="text-align:center; color:#e74c3c;">Error de conexión. No se pudieron cargar los archivos.</p>';
+    }
+}
+
+async function borrarTirada(id) {
+    if (!confirm("¿Confirma que desea purgar este registro de batalla permanentemente?")) return;
+    
+    try {
+        // Usamos la constante API_BASE centralizada
+        const response = await fetch(`${API_BASE}/historial/${id}`, { 
+            method: 'DELETE' 
+        });
+        
+        if (response.ok) {
+            cargarHistorialDefinitivo();
+        } else {
+            alert("Los servidores imperiales denegaron la purga.");
+        }
+    } catch (e) {
+        console.error("Error al intentar purgar el archivo:", e);
+        alert("Fallo de conexión al intentar eliminar el archivo.");
     }
 }

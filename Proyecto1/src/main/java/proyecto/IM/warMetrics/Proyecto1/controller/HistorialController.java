@@ -5,7 +5,9 @@ package proyecto.IM.warMetrics.Proyecto1.controller;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,5 +48,21 @@ public class HistorialController {
     @GetMapping("/usuario/{id}")
     public List<HistorialTirada> obtenerHistorial(@PathVariable Long id) {
         return historialRepository.findByUsuarioIdOrderByFechaCreacionDesc(id);
+    }
+
+   
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> borrarTirada(@PathVariable Long id) {
+        try {
+            if (historialRepository.existsById(id)) {
+                historialRepository.deleteById(id);
+                return ResponseEntity.ok("Archivo eliminado correctamente.");
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error al intentar eliminar el archivo.");
+        }
     }
 }

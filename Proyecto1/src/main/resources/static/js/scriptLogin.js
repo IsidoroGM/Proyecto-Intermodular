@@ -1,5 +1,6 @@
 // --- VARIABLES GLOBALES DE USUARIO ---
 let usuarioActual = null; // Guardará { id: 1, username: "Pepe" }
+const API_BASE = "http://localhost:8080/api"; // Centralizamos la URL del servidor
 
 // 1. Alternar entre Login y Registro en la interfaz
 let modoRegistro = false;
@@ -19,7 +20,7 @@ async function hacerLogin() {
     const msj = document.getElementById('auth-mensaje');
 
     try {
-        const response = await fetch('http://localhost:8080/api/auth/login', {
+        const response = await fetch(`${API_BASE}/auth/login`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: user, password: pass })
@@ -28,6 +29,9 @@ async function hacerLogin() {
         if (response.ok) {
             usuarioActual = await response.json();
             
+            // Verificación de integridad: el backend debe devolver el ID
+            if(!usuarioActual.id) throw new Error("Datos de usuario incompletos.");
+            
             // Guardamos sesión
             localStorage.setItem('warmetrics_user', JSON.stringify(usuarioActual)); 
             // Guardamos el ID suelto por compatibilidad con el script principal del historial
@@ -35,12 +39,18 @@ async function hacerLogin() {
             
             actualizarInterfazAuth();
             msj.innerText = '';
+
+            // Refrescamos el panel de guardado si estamos en el simulador
+            if (typeof gestionarPanelGuardado === 'function') {
+                gestionarPanelGuardado();
+            }
+
         } else {
             const errorText = await response.text();
-            msj.innerText = errorText;
+            msj.innerText = "Credenciales incorrectas. Revisa tu usuario/password.";
         }
     } catch (e) {
-        msj.innerText = "Error de conexión con el servidor.";
+        msj.innerText = "⚠️ El servidor de WarMetrics no responde. Inténtalo más tarde.";
     }
 }
 
@@ -52,7 +62,7 @@ async function hacerRegistro() {
     const msj = document.getElementById('auth-mensaje');
 
     try {
-        const response = await fetch('http://localhost:8080/api/auth/registro', {
+        const response = await fetch(`${API_BASE}/auth/registro`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username: user, email: email, password: pass })
@@ -68,9 +78,10 @@ async function hacerRegistro() {
             msj.innerText = texto;
         }
     } catch (e) {
-        msj.innerText = "Error de conexión.";
+        msj.innerText = "⚠️ Error de conexión con el servidor.";
     }
 }
+
 // 4. Cerrar Sesión (Versión Definitiva)
 function cerrarSesion() {
     // 1. Borramos todo rastro del usuario en la memoria del navegador
@@ -130,7 +141,6 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // --- FUNCIONALIDAD: MOSTRAR/OCULTAR CONTRASEÑA ---
-// Esta función cambia a text o el input de contraseña para mostrarla, y vuelve a password para ocultarla. También cambia el icono del ojo.
 function togglePasswordVisibility() {
     const passInput = document.getElementById('auth-password');
     const eyeIcon = document.getElementById('toggle-eye');
