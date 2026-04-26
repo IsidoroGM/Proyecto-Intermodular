@@ -34,9 +34,10 @@ async function guardarNuevaUnidad() {
 
     // 4. Enviamos al Backend usando la constante centralizada (Paso 14)
     try {
+        // En guardarNuevaUnidad()
         const response = await fetch(`${API_BASE}/tarjetas/guardar`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: getAuthHeaders(), // <-- CAMBIAMOS ESTA LÍNEA
             body: JSON.stringify(payload)
         });
 

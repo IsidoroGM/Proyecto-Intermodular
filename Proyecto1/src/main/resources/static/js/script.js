@@ -235,7 +235,14 @@ async function cargarTarjetasUnidad() {
 
     try {
         // CORRECCIÓN: Usamos la constante API_BASE
-        const response = await fetch(`${API_BASE}/tarjetas/usuario/${usuarioActual.id}`);
+        const response = await fetch(`${API_BASE}/tarjetas/usuario/${usuarioActual.id}`, {
+            method: 'GET',
+            headers: getAuthHeaders() // <-- ¡AQUÍ ESTÁ LA MAGIA QUE ENSEÑA EL TOKEN!
+        });
+
+        if (!response.ok) {
+            throw new Error("Petición denegada por el servidor");
+        }
         const tarjetas = await response.json();
         
         // Guardamos las tarjetas en la variable global
@@ -314,9 +321,9 @@ async function borrarTarjeta(id) {
     if (!confirm("Comandante, ¿está seguro de que desea eliminar esta unidad de los registros?")) return;
     
     try {
-        // CORRECCIÓN: Usamos la constante API_BASE
         const response = await fetch(`${API_BASE}/tarjetas/${id}`, { 
-            method: 'DELETE' 
+            method: 'DELETE',
+            headers: getAuthHeaders() // <-- ¡AQUÍ ESTÁ LA CLAVE! Enseñamos el token
         });
         
         if (response.ok) {
