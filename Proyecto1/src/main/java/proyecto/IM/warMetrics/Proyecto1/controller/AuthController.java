@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import proyecto.IM.warMetrics.Proyecto1.Service.AuthService;
+import proyecto.IM.warMetrics.Proyecto1.config.JwtService;
 import proyecto.IM.warMetrics.Proyecto1.dto.RegistroRequest;
 
 @RestController
@@ -21,9 +22,11 @@ import proyecto.IM.warMetrics.Proyecto1.dto.RegistroRequest;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtService jwtService; // Inyectamos el servicio de JWT para generar tokens al hacer login
 
-    public AuthController(AuthService authService) {
+    public AuthController(AuthService authService, JwtService jwtService) {
         this.authService = authService;
+        this.jwtService = jwtService;
     }
 
 
@@ -41,12 +44,22 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody proyecto.IM.warMetrics.Proyecto1.dto.LoginRequest request) {
         try {
             proyecto.IM.warMetrics.Proyecto1.model.Usuario usuario = authService.login(request.getUsername(), request.getPassword());
+
+            //1. Si el login es correcto, generamos un token JWT para este usuario
+            String token = jwtService.generarToken(usuario);
+
+             //2. Devolvemos el token junto con los datos del usuario (sin la contraseña)
+             //El frontend usará este token para acceder a las rutas protegidas   
+
+
+
             
             // Devolvemos solo los datos necesarios al frontend (sin la contraseña)
             Map<String, Object> response = new HashMap<>();
             response.put("id", usuario.getId());
             response.put("username", usuario.getUsername());
-            
+            response.put("token", token); // Agregamos el token al JSON de respuesta
+
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Error: " + e.getMessage());
