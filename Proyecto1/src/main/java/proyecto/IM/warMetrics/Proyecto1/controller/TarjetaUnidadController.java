@@ -74,4 +74,28 @@ public class TarjetaUnidadController {
         tarjetaRepository.deleteById(id);
         return ResponseEntity.ok("Tarjeta eliminada");
     }
+
+    // 4. Actualizar una tarjeta existente (Update)
+    // El @PutMapping busca una tarjeta por su ID y actualiza todos sus campos
+    @org.springframework.web.bind.annotation.PutMapping("/{id}")
+    public ResponseEntity<?> actualizarTarjeta(@PathVariable Long id, @RequestBody TarjetaUnidadRequest req) {
+        return tarjetaRepository.findById(id).map(tarjeta -> {
+            // Actualizamos los valores del modelo con los que vienen en el Request
+            tarjeta.setNombre(req.getNombre());
+            tarjeta.setNotas(req.getNotas());
+            tarjeta.setNumAtaques(req.getNumAtaques());
+            tarjeta.setImpactoX(req.getImpactoX());
+            tarjeta.setRepeticionImpacto(req.getRepeticionImpacto());
+            tarjeta.setEspecialSeisImpacto(req.getEspecialSeisImpacto());
+            tarjeta.setHerirX(req.getHerirX());
+            tarjeta.setRepeticionHerir(req.getRepeticionHerir());
+            tarjeta.setSeisHeridaInsalvable(req.isSeisHeridaInsalvable());
+            tarjeta.setSalvacionX(req.getSalvacionX());
+            tarjeta.setDanoPorAtaque(req.getDanoPorAtaque());
+            tarjeta.setNoHayDolorX(req.getNoHayDolorX());
+            
+            tarjetaRepository.save(tarjeta); // Guardamos los cambios
+            return ResponseEntity.ok("Tarjeta actualizada con éxito");
+        }).orElse(ResponseEntity.badRequest().body("Error: No se encontró la tarjeta con ID: " + id));
+    }
 }
