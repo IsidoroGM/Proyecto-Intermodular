@@ -1,5 +1,5 @@
 /**
- * Función mágica para añadir el Token a cualquier petición
+ * Función para añadir el Token a cualquier petición
  */
 function getAuthHeaders() {
     const user = JSON.parse(localStorage.getItem('warmetrics_user'));
