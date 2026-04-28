@@ -6,7 +6,7 @@ package proyecto.IM.warMetrics.Proyecto1.dto;
 public class AtaqueRequest {
     // Parámetros básicos
     private int numAtaques;
-    private int dañoPorAtaque;
+    private int danoPorAtaque;
     
     // 1º Tirada: Impactar
     private int impactoX; 
@@ -26,8 +26,8 @@ public class AtaqueRequest {
     public int getNumAtaques() { return numAtaques; }
     public void setNumAtaques(int numAtaques) { this.numAtaques = numAtaques; }
 
-    public int getDañoPorAtaque() { return dañoPorAtaque; }
-    public void setDañoPorAtaque(int dañoPorAtaque) { this.dañoPorAtaque = dañoPorAtaque; }
+    public int getDanoPorAtaque() { return danoPorAtaque; }
+    public void setDanoPorAtaque(int danoPorAtaque) { this.danoPorAtaque = danoPorAtaque; }
 
     public int getImpactoX() { return impactoX; }
     public void setImpactoX(int impactoX) { this.impactoX = impactoX; }

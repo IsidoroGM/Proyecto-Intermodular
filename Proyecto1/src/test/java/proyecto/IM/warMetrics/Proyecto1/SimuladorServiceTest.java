@@ -41,7 +41,7 @@ class SimuladorServiceTest {
         requestBasico.setRepeticionHerir("NONE");
         requestBasico.setSeisHeridaInsalvable(false);
         requestBasico.setSalvacionX(5);         // Salva a 5+
-        requestBasico.setDañoPorAtaque(1);      // Daño 1
+        requestBasico.setDanoPorAtaque(1);      // Daño 1
         requestBasico.setNoHayDolorX(0);        // Sin FNP
     }
 

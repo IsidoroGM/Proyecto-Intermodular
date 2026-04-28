@@ -1,67 +1,110 @@
-/* ========================================= */
-/* 📱 WAR-METRICS RESPONSIVE MODULE          */
-/* ========================================= */
-
-/* TABLETS Y PANTALLAS MEDIANAS (Menos de 1024px) */
-@media (max-width: 1024px) {
+/* =========================================================
+   GUERRA MÓVIL: Pantallas menores de 1024px (Tablets)
+========================================================= */
+@media screen and (max-width: 1024px) {
+    /* Rompemos las 3 columnas y hacemos que todo fluya hacia abajo */
     .main-layout {
         display: flex;
-        flex-direction: column; /* Apilamos las sidebars arriba y abajo */
+        flex-direction: column;
     }
 
+    /* Las barras laterales ahora ocupan el 100% del ancho y se apilan */
     .sidebar {
-        width: 100% !important;
-        min-height: auto !important;
-        border: none;
+        width: 100%;
+        border-right: none;
         border-bottom: 1px solid var(--border-dark);
+        padding: 15px;
     }
 
-    /* El menú de navegación se vuelve horizontal */
-    #user-panel ul {
-        display: flex;
-        justify-content: space-around;
-        padding: 0;
-        flex-wrap: wrap;
-    }
-
-    #user-panel ul li {
-        margin-bottom: 0;
+    /* El contenido central pierde los márgenes laterales */
+    .content-area {
+        width: 100%;
+        padding: 10px;
     }
 }
 
-/* MÓVILES (Menos de 768px) */
-@media (max-width: 768px) {
-    /* Ajustamos el Header */
+/* =========================================================
+   GUERRA DE TRINCHERAS: Pantallas menores de 768px (Móviles)
+========================================================= */
+@media screen and (max-width: 768px) {
+    /* 1. HEADER: Centramos el logo y el estado de la conexión */
     .main-header {
         flex-direction: column;
-        height: auto;
-        padding: 15px;
+        align-items: center;
         gap: 15px;
+        padding: 15px;
+        text-align: center;
     }
 
-    /* Los formularios pasan de 2 columnas a 1 sola para que los inputs sean grandes */
+    /* 2. FORMULARIOS: Forzamos a que todos los inputs vayan a 1 sola columna */
     .input-grid {
         grid-template-columns: 1fr !important;
+        gap: 10px;
     }
 
-    /* Ajuste de márgenes para que la tarjeta no pegue al borde del móvil */
-    .content-area {
-        padding: 10px;
+    /* 3. RESULTADOS: Apilamos la tirada aleatoria y la estadística */
+    #contenedorResultados {
+        flex-direction: column;
+        gap: 10px;
     }
 
-    .simulator-card {
-        margin: 0;
-        border-radius: 0; /* En móvil queda mejor sin bordes redondeados laterales */
+    .caja-resultado {
+        width: 100%;
+        text-align: center;
     }
 
-    /* Botones 'Touch-Friendly' (Más grandes para el dedo) */
+    /* 4. BOTONES: Los hacemos grandes y fáciles de pulsar con el pulgar */
     .btn-primary {
-        height: 55px;
+        width: 100%;
+        padding: 15px;
         font-size: 1.1em;
     }
 
-    /* Las tarjetas de la armería se ponen una debajo de otra */
+    /* 5. TARJETAS DE UNIDAD: Nos aseguramos de que ocupen todo el ancho */
     #lista-tarjetas-unidad {
         grid-template-columns: 1fr !important;
     }
+}
+
+/* Estilos para el botón (solo se ve en móvil) */
+.menu-btn {
+    display: none; /* Oculto en escritorio */
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: 1.5rem;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-right: 10px;
+    box-shadow: 0 0 5px var(--accent);
+}
+
+@media screen and (max-width: 1024px) {
+    .menu-btn {
+        display: block; /* Aparece en móviles/tablets */
+    }
+
+    /* La barra lateral ahora está oculta por defecto en móvil */
+    .left-sidebar {
+        display: none; 
+        width: 100%;
+        position: absolute; /* Para que flote sobre el contenido */
+        top: 70px; /* Debajo del header */
+        left: 0;
+        z-index: 1000;
+        background: var(--bg-panels);
+        border-bottom: 2px solid var(--accent);
+    }
+
+    /* Clase que activaremos con JS para mostrarla */
+    .left-sidebar.active {
+        display: block !important;
+        animation: fadeInDown 0.3s ease;
+    }
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
 }

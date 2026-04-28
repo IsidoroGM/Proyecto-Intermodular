@@ -5,71 +5,89 @@ let ultimoResultado = null; // Guardará el último cálculo hecho
  * 1. SIMULADOR: Ejecuta la simulación enviando los datos al backend
  */
 async function ejecutarSimulacion() {
-    // Recolección de datos del formulario principal
-    const payload = {
-        numAtaques: parseInt(document.getElementById('numAtaques').value) || 0,
-        dañoPorAtaque: parseInt(document.getElementById('dañoPorAtaque').value) || 0,
-        impactoX: parseInt(document.getElementById('impactoX').value) || 0,
-        repeticionImpacto: document.getElementById('repeticionImpacto').value,
-        especialSeisImpacto: document.getElementById('especialSeisImpacto').value,
-        herirX: parseInt(document.getElementById('herirX').value) || 0,
-        repeticionHerir: document.getElementById('repeticionHerir').value, 
-        seisHeridaInsalvable: document.getElementById('seisHeridaInsalvable').checked,
-        salvacionX: parseInt(document.getElementById('salvacionX').value) || 0,
-        noHayDolorX: parseInt(document.getElementById('noHayDolorX').value || 0)
+    // 1. Recogemos los valores con los nombres exactos que espera tu DTO de Java
+    const datosSimulacion = {
+        numAtaques: parseInt(document.getElementById('numAtaques')?.value) || 0,
+        danoPorAtaque: parseInt(document.getElementById('dañoPorAtaque')?.value) || 1, // 'dano' sin ñ
+        impactoX: parseInt(document.getElementById('impactoX')?.value) || 4,
+        herirX: parseInt(document.getElementById('herirX')?.value) || 4, // Usamos herirX en lugar de fuerza
+        salvacionX: parseInt(document.getElementById('salvacionX')?.value) || 7, 
+        noHayDolorX: parseInt(document.getElementById('noHayDolorX')?.value) || 7,
+        
+        // Opciones de repetición y reglas especiales
+        repeticionImpacto: document.getElementById('repeticionImpacto')?.value || 'NONE',
+        especialSeisImpacto: document.getElementById('especialSeisImpacto')?.value || 'NONE',
+        repeticionHerir: document.getElementById('repeticionHerir')?.value || 'NONE',
+        seisHeridaInsalvable: document.getElementById('seisHeridaInsalvable')?.checked || false
     };
 
-    const contenedor = document.getElementById('contenedorResultados');
-
     try {
-        // CORRECCIÓN: Usamos la constante API_BASE con comillas invertidas
         const response = await fetch(`${API_BASE}/v1/combate/simular`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            body: JSON.stringify(datosSimulacion)
         });
 
-        if (!response.ok) throw new Error("Error en la respuesta del servidor");
+        if (!response.ok) {
+            throw new Error(`Error en el servidor: ${response.status}`);
+        }
 
-        const data = await response.json(); 
+        const resultado = await response.json();
+        ultimoResultado = resultado; 
+
+        // 3. Mostramos los resultados reales
+        mostrarResultadosEnPantalla(resultado);
         
-        // Persistencia temporal para el guardado posterior
-        ultimoResultado = {
-            dañoAleatorio: data.heridasFinalesAleatorias || data.dañoAleatorio,
-            dañoMedioEstadistico: data.heridasFinalesEstadisticas || data.dañoMedioEstadistico
-        };
-
-        // Actualización de la Interfaz (Resultados Centrales)
-        contenedor.style.display = 'flex';
-        contenedor.innerHTML = `
-            <div class="caja-resultado aleatorio">
-                🎲 Tirada de dados: <strong>${ultimoResultado.dañoAleatorio}</strong> daños realizados
-            </div>
-            <div class="caja-resultado estadistica">
-                📊 Media (MathHammer): <strong>${ultimoResultado.dañoMedioEstadistico}</strong> daños esperados
-            </div>
-        `;
-
-        actualizarResumenRapido(payload, ultimoResultado);
-        gestionarPanelGuardado();
+        // 4. Actualizamos el historial rápido de la derecha
+        actualizarResumenRapido(datosSimulacion, resultado);
+        gestionarPanelGuardado(); 
 
     } catch (error) {
-        console.error('Error durante la simulación:', error);
-        contenedor.style.display = 'flex';
-        contenedor.innerHTML = `<div class="caja-resultado error">⚠️ Error de conexión con el motor de combate.</div>`;
+        console.error("Error durante la simulación:", error);
+        mostrarNotificacion("Error de cálculo: Verifica los datos introducidos", "error"); 
     }
+}
+
+
+/**
+ * Pinta los números grandes en el centro de la pantalla
+ */
+function mostrarResultadosEnPantalla(res) {
+    // 1. Hacemos visible el contenedor de resultados
+    const contenedor = document.getElementById('contenedorResultados');
+    if (contenedor) {
+        contenedor.style.display = 'flex'; 
+    }
+
+    // 2. Localizamos las pantallas numéricas
+    const divReal = document.getElementById('resultado-aleatorio');
+    const divMedia = document.getElementById('resultado-estadistico');
+
+    // 3. Pintamos los datos (Contemplamos "dano" y "daño" por compatibilidad con el backend)
+    const valorReal = res.dañoAleatorio !== undefined ? res.dañoAleatorio : res.danoAleatorio;
+    const valorMedia = res.dañoMedioEstadistico !== undefined ? res.dañoMedioEstadistico : res.danoMedioEstadistico;
+
+    if (divReal) divReal.innerText = valorReal;
+    if (divMedia) divMedia.innerText = valorMedia.toFixed(2);
+    
+    // 4. Animación de pulso neón
+    const displays = document.querySelectorAll('.display-resultados');
+    displays.forEach(display => {
+        display.style.animation = 'none';
+        display.offsetHeight; // Truco para reiniciar la animación
+        display.style.animation = 'pulse-neon 0.5s ease-out';
+    });
 }
 
 /**
  * 2. FUNCIONES AUXILIARES DEL SIMULADOR
  */
 function gestionarPanelGuardado() {
-    // Validamos que usuarioActual exista y esté logueado
+    // Validamos que usuarioActual exista (viene de scriptLogin.js)
     if (typeof usuarioActual !== 'undefined' && usuarioActual !== null) {
         const panelGuardar = document.getElementById('panel-guardar-tirada');
         if (panelGuardar) {
             panelGuardar.classList.remove('pantalla-oculta');
-            panelGuardar.classList.add('pantalla-activa');
             panelGuardar.style.display = 'block'; 
         }
     }
@@ -80,12 +98,10 @@ function actualizarResumenRapido(payload, resultado) {
     if (quickStats) {
         const nuevaEntrada = document.createElement('div');
         nuevaEntrada.className = "resumen-entrada"; 
-        nuevaEntrada.style.padding = "10px";
-        nuevaEntrada.style.borderBottom = "1px solid var(--border-dark)";
-        nuevaEntrada.style.fontSize = "0.85rem";
         nuevaEntrada.innerHTML = `
-            <strong>Ataque:</strong> ${payload.numAtaques} dados<br>
-            <strong>Resultado:</strong> <span style="color:var(--accent)">${resultado.dañoAleatorio}</span> | <strong>Media:</strong> ${resultado.dañoMedioEstadistico}
+            <strong>${payload.numAtaques} Atqs:</strong> 
+            <span style="color:var(--accent)">${resultado.dañoAleatorio}</span> 
+            <small>(Med: ${resultado.dañoMedioEstadistico})</small>
         `;
         quickStats.prepend(nuevaEntrada);
         
@@ -99,7 +115,6 @@ function actualizarResumenRapido(payload, resultado) {
  */
 window.onload = async function() {
     try {
-        // CORRECCIÓN: Usamos la constante API_BASE
         const response = await fetch(`${API_BASE}/v1/combate/status`); 
         const statusElement = document.getElementById('motor-status');
         if (response.ok && statusElement) {
@@ -116,55 +131,55 @@ window.onload = async function() {
 };
 
 /**
- * 4. NAVEGACIÓN ENTRE PANTALLAS (GUARDIA DE NAVEGACIÓN AÑADIDO)
+ * 4. NAVEGACIÓN ENTRE PANTALLAS
  */
 function cambiarPantalla(destino) {
-    // 1. Verificar si la pantalla es protegida
     const pantallasProtegidas = ['unidades', 'historial'];
-    const estaLogueado = (typeof usuarioActual !== 'undefined' && usuarioActual !== null && usuarioActual.id !== undefined);
+    const estaLogueado = (typeof usuarioActual !== 'undefined' && usuarioActual !== null);
 
     if (pantallasProtegidas.includes(destino) && !estaLogueado) {
-        alert("⚠️ Acceso denegado. Debes iniciar sesión para acceder a la Armería o al Historial.");
-        // Redirigimos al simulador si intenta entrar sin permiso
-        return cambiarPantalla('simulador'); 
+        mostrarNotificacion("⚠️ Debes iniciar sesión para acceder a esta sección.", "error");
+        return; 
     }
 
-    console.log("Navegando hacia:", destino); 
-
     // Ocultar todas las pantallas
-    const pantallas = ['pantalla-simulador', 'pantalla-unidades', 'pantalla-historial'];
-    pantallas.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.classList.remove('pantalla-activa');
-            el.classList.add('pantalla-oculta');
-        }
-    });
-
-    // Desactivar botones del menú
-    document.querySelectorAll('.sidebar ul li a').forEach(el => {
-        el.classList.remove('active');
+    document.querySelectorAll('.pantalla-seccion').forEach(el => {
+        el.classList.remove('pantalla-activa');
+        el.classList.add('pantalla-oculta');
     });
 
     // Activar pantalla destino
     const pantallaDestino = document.getElementById(`pantalla-${destino}`);
-    const menuDestino = document.getElementById(`menu-${destino}`);
-
     if (pantallaDestino) {
         pantallaDestino.classList.remove('pantalla-oculta');
         pantallaDestino.classList.add('pantalla-activa');
     }
 
-    if (menuDestino) {
-        menuDestino.classList.add('active');
-    }
+    // Actualizar menú activo
+    document.querySelectorAll('.sidebar ul li a').forEach(el => el.classList.remove('active'));
+    const menuDestino = document.getElementById(`menu-${destino}`);
+    if (menuDestino) menuDestino.classList.add('active');
 
-    // Cargar datos si el usuario está logueado
+    // Cargar datos específicos si es necesario
     if (estaLogueado) {
         if (destino === 'unidades') cargarTarjetasUnidad();
-        if (destino === 'historial' && typeof cargarHistorialDefinitivo === 'function') {
-            cargarHistorialDefinitivo(); // NUEVO NOMBRE
-        }
+        if (destino === 'historial') cargarHistorialVisual();
     }
 }
 
+// Integración con el menú móvil (Paso 19)
+function toggleSidebar() {
+    document.querySelector('.left-sidebar').classList.toggle('active');
+}
+
+/**
+ * Utilidad para mostrar mensajes elegantes estilo Toast
+ */
+function mostrarNotificacion(mensaje, tipo) {
+    console.log(`[${tipo.toUpperCase()}] ${mensaje}`);
+    const msjBox = document.getElementById('auth-mensaje');
+    if (msjBox) {
+        msjBox.innerText = mensaje;
+        msjBox.style.color = tipo === 'error' ? '#ff4d4d' : 'var(--accent)';
+    }
+}

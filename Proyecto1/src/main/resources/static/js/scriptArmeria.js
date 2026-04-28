@@ -16,10 +16,9 @@ async function cargarTarjetasUnidad() {
     if (!contenedor) return; 
 
     try {
-        // CORRECCIÓN: Usamos la constante API_BASE
         const response = await fetch(`${API_BASE}/tarjetas/usuario/${usuarioActual.id}`, {
-            method: 'GET',
-            headers: getAuthHeaders() // <-- ¡AQUÍ ESTÁ LA MAGIA QUE ENSEÑA EL TOKEN!
+            method: 'GET'
+            // ELIMINADO: headers: getAuthHeaders()
         });
 
         if (!response.ok) {
@@ -35,7 +34,7 @@ async function cargarTarjetasUnidad() {
             return;
         }
 
-        // Dibujar las tarjetas dinámicamente PASANDO SOLO EL ID (Mucho más seguro)
+        // Dibujar las tarjetas dinámicamente PASANDO SOLO EL ID
         contenedor.innerHTML = tarjetas.map(t => `
             <div class="tarjeta-unidad" style="background: var(--bg-panels); border: 1px solid var(--border-dark); padding: 15px; border-radius: 5px; cursor: pointer; transition: 0.3s;" 
                  onclick="prepararEquiparUnidad(${t.id})"
@@ -57,7 +56,7 @@ async function cargarTarjetasUnidad() {
     }
 }
 
-// 2. Cargar las tarjetas al iniciar sesión (Llamada desde script.js tras login exitoso)
+// 2. Cargar las tarjetas al iniciar sesión 
 async function guardarNuevaUnidad() {
     // 1. Verificamos si hay usuario logueado de forma estricta
     if (!usuarioActual || !usuarioActual.id) {
@@ -92,29 +91,25 @@ async function guardarNuevaUnidad() {
     };
 
     // 4. MAGIA CRUD: Decidimos la ruta y el método
-    // Si tenemos un ID, sobrescribimos (PUT). Si no, creamos una nueva (POST).
     const url = idTarjetaEditando 
                 ? `${API_BASE}/tarjetas/${idTarjetaEditando}` 
                 : `${API_BASE}/tarjetas/guardar`;
                 
     const metodo = idTarjetaEditando ? 'PUT' : 'POST';
 
-    // 5. Enviamos al Backend con nuestra cabecera JWT
+    // 5. Enviamos al Backend (SIN TOKEN)
     try {
         const response = await fetch(url, {
             method: metodo,
-            headers: getAuthHeaders(), // Pasaporte VIP siempre presente
+            headers: { 'Content-Type': 'application/json' }, // Solo especificamos que enviamos un JSON
             body: JSON.stringify(payload)
         });
 
         if (response.ok) {
-            // Mensaje dinámico según si hemos editado o creado
             alert(idTarjetaEditando ? `¡Unidad "${nombre}" actualizada con éxito!` : `¡Unidad "${nombre}" guardada en la armería!`);
             
-            // Limpiamos los campos y el estado
             resetearFormularioArmeria();
             
-            // Recargamos la vista de las tarjetas
             if (typeof cargarTarjetasUnidad === 'function') {
                 cargarTarjetasUnidad();
             }
@@ -127,7 +122,7 @@ async function guardarNuevaUnidad() {
     }
 }
 
-// 3. Función intermedia para equipar (Busca los datos de forma segura)
+// 3. Función intermedia para equipar
 function prepararEquiparUnidad(idTarjeta) {
     const tarjeta = misTarjetasGlobal.find(t => t.id === idTarjeta);
     if (tarjeta) {
@@ -156,12 +151,10 @@ function equiparUnidad(tarjeta) {
     setValor('dañoPorAtaque', tarjeta.danoPorAtaque);
     setValor('noHayDolorX', tarjeta.noHayDolorX || 0);
     
-    // Selects
     if (tarjeta.repeticionImpacto) setValor('repeticionImpacto', tarjeta.repeticionImpacto);
     if (tarjeta.especialSeisImpacto) setValor('especialSeisImpacto', tarjeta.especialSeisImpacto);
     if (tarjeta.repeticionHerir) setValor('repeticionHerir', tarjeta.repeticionHerir);
     
-    // Checkbox
     if (tarjeta.seisHeridaInsalvable !== undefined) setCheck('seisHeridaInsalvable', tarjeta.seisHeridaInsalvable);
 
     alert(`¡Unidad "${tarjeta.nombre}" lista para el combate!`);
@@ -170,11 +163,9 @@ function equiparUnidad(tarjeta) {
 
 // 5. Edición de tarjetas 
 function prepararEdicion(id) {
-    // 1. Buscamos los datos de la tarjeta en nuestra lista global (cargada previamente en script.js)
     const tarjeta = misTarjetasGlobal.find(t => t.id === id);
     if (!tarjeta) return;
 
-    // 2. Rellenamos el formulario de la Armería con los datos
     document.getElementById('nueva-unidad-nombre').value = tarjeta.nombre;
     document.getElementById('nueva-unidad-ataques').value = tarjeta.numAtaques;
     document.getElementById('nueva-unidad-dano').value = tarjeta.danoPorAtaque;
@@ -188,14 +179,11 @@ function prepararEdicion(id) {
     document.getElementById('nueva-unidad-fnp').value = tarjeta.noHayDolorX;
     document.getElementById('nueva-unidad-notas').value = tarjeta.notas;
 
-    // 3. Cambiamos el estado a "Editando"
     idTarjetaEditando = id;
     
-    // 4. Feedback visual: Cambiamos el texto del botón de guardado
     const btnGuardar = document.querySelector('#pantalla-unidades .card-footer .btn-primary');
     if(btnGuardar) btnGuardar.innerText = "Actualizar Unidad en Armería";
 
-    // 5. Scroll suave hasta el formulario para que el usuario sepa dónde ir
     document.querySelector('#pantalla-unidades .step-group').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -205,12 +193,12 @@ async function borrarTarjeta(id) {
     
     try {
         const response = await fetch(`${API_BASE}/tarjetas/${id}`, { 
-            method: 'DELETE',
-            headers: getAuthHeaders() // <-- ¡AQUÍ ESTÁ LA CLAVE! Enseñamos el token
+            method: 'DELETE'
+            // ELIMINADO: headers: getAuthHeaders()
         });
         
         if (response.ok) {
-            cargarTarjetasUnidad(); // Recargamos para que desaparezca
+            cargarTarjetasUnidad(); 
         } else {
             alert("Los servidores de la armería denegaron la solicitud de borrado.");
         }
@@ -220,10 +208,8 @@ async function borrarTarjeta(id) {
 }
 
 function resetearFormularioArmeria() {
-    // 1. Dejamos de "editar"
     idTarjetaEditando = null;
 
-    // 2. Vaciamos todos los campos visuales a sus valores por defecto
     document.getElementById('nueva-unidad-nombre').value = '';
     document.getElementById('nueva-unidad-notas').value = '';
     document.getElementById('nueva-unidad-ataques').value = 1;
@@ -237,7 +223,6 @@ function resetearFormularioArmeria() {
     document.getElementById('nueva-unidad-salvacion').value = 5;
     document.getElementById('nueva-unidad-fnp').value = 0;
 
-    // 3. Devolvemos el botón a su texto original
     const btnGuardar = document.querySelector('#pantalla-unidades .card-footer .btn-primary');
     if(btnGuardar) btnGuardar.innerText = "Guardar en Armería";
 }

@@ -1,8 +1,5 @@
 package proyecto.IM.warMetrics.Proyecto1.controller;
 
-//Este será el encargado de gestionar las tiradas guardadas y de devolver el historial cuando el usuario haga clic en la pestaña "Historial".
-//Recibirá las peticiones del frontend, se comunicará con el SimuladorService para guardar las tiradas, y con el HistorialTiradaRepository para recuperar el historial de un usuario específico.
-
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -35,13 +32,8 @@ public class HistorialController {
 
     @PostMapping("/guardar")
     public String guardar(@RequestBody GuardarTiradasRequest request) {
-        simuladorService.guardarEnHistorial(
-            request.getUsuarioId(), 
-            request.getTitulo(), 
-            request.getNotas(), 
-            request.getAleatorio(), 
-            request.getMedia()
-        );
+        // ENLACE DIRECTO: Pasamos el objeto DTO completo al servicio
+        simuladorService.guardarEnHistorial(request);
         return "Tirada guardada en el historial.";
     }
 
@@ -49,8 +41,6 @@ public class HistorialController {
     public List<HistorialTirada> obtenerHistorial(@PathVariable Long id) {
         return historialRepository.findByUsuarioIdOrderByFechaCreacionDesc(id);
     }
-
-   
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> borrarTirada(@PathVariable Long id) {
