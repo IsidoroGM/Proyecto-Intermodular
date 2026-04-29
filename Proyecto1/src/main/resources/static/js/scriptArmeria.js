@@ -36,10 +36,10 @@ async function cargarTarjetasUnidad() {
 
         // Dibujar las tarjetas dinámicamente PASANDO SOLO EL ID
         contenedor.innerHTML = tarjetas.map(t => `
-            <div class="tarjeta-unidad glass-panel">
-                 onclick="prepararEquiparUnidad(${t.id})"
-                 onmouseover="this.style.borderColor='var(--accent)'" 
-                 onmouseout="this.style.borderColor='var(--border-dark)'">
+            <div class="tarjeta-unidad glass-panel"
+                onclick="prepararEquiparUnidad(${t.id})"
+                onmouseover="this.style.borderColor='var(--accent)'" 
+                onmouseout="this.style.borderColor='var(--border-dark)'">
                 <h4 style="color: var(--accent); margin: 0 0 10px 0;">${t.nombre}</h4>
                 <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0 0 10px 0;">${t.notas || 'Sin notas tácticas'}</p>
                 <div style="font-size: 0.85rem; color: #ccc;">
@@ -60,7 +60,9 @@ async function cargarTarjetasUnidad() {
 async function guardarNuevaUnidad() {
     // 1. Verificamos si hay usuario logueado de forma estricta
     if (!usuarioActual || !usuarioActual.id) {
-        alert("⚠️ Comandante, debe iniciar sesión para guardar unidades en la armería.");
+        alert("⚠️ Sesión inválida. Por favor, vuelve a iniciar sesión.");
+        localStorage.clear();
+        location.reload();
         return;
     }
 
@@ -72,6 +74,8 @@ async function guardarNuevaUnidad() {
         alert("⚠️ La unidad necesita un nombre para ser identificada.");
         return;
     }
+
+    console.log("Usuario actual al guardar:", usuarioActual);
 
     // 3. Empaquetamos los datos usando los IDs del formulario
     const payload = {
@@ -114,7 +118,9 @@ async function guardarNuevaUnidad() {
                 cargarTarjetasUnidad();
             }
         } else {
-            alert("❌ Hubo un error en los servidores de la armería al intentar guardar.");
+            const errorTexto = await response.text();
+            console.error("Error al guardar tarjeta:", response.status, errorTexto);
+            alert(`❌ Error ${response.status}: ${errorTexto}`);
         }
     } catch (error) {
         console.error("Error de conexión al guardar tarjeta:", error);

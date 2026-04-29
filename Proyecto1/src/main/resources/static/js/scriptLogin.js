@@ -112,7 +112,7 @@ function actualizarInterfazAuth() {
         }
         
         if (typeof cargarTarjetasUnidad === 'function') cargarTarjetasUnidad();
-        if (typeof cargarHistorialVisual === 'function') cargarHistorialVisual();
+        if (typeof cargarHistorialDefinitivo === 'function') cargarHistorialDefinitivo();
 
     } else {
         authPanel.classList.remove('pantalla-oculta');

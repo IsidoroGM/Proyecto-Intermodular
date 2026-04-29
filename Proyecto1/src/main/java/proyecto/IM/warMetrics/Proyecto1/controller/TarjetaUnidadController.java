@@ -40,7 +40,7 @@ public class TarjetaUnidadController {
     public ResponseEntity<?> guardarTarjeta(@RequestBody TarjetaUnidadRequest req) {
         Usuario usuario = usuarioRepository.findById(req.getUsuarioId()).orElse(null);
         if (usuario == null) {
-            return ResponseEntity.badRequest().body("Usuario no encontrado");
+            return ResponseEntity.status(404).body("Usuario no encontrado");
         }
 
         TarjetaUnidad tarjeta = new TarjetaUnidad();

@@ -31,26 +31,33 @@ public class HistorialController {
     }
 
     @PostMapping("/guardar")
-    public String guardar(@RequestBody GuardarTiradasRequest request) {
-        // ENLACE DIRECTO: Pasamos el objeto DTO completo al servicio
-        simuladorService.guardarEnHistorial(request);
-        return "Tirada guardada en el historial.";
+    public ResponseEntity<String> guardar(@RequestBody GuardarTiradasRequest request) {
+        try {
+            simuladorService.guardarEnHistorial(request);
+            return ResponseEntity.ok("Tirada guardada en el historial.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error interno al guardar la tirada.");
+        }
     }
 
     @GetMapping("/usuario/{id}")
-    public List<HistorialTirada> obtenerHistorial(@PathVariable Long id) {
-        return historialRepository.findByUsuarioIdOrderByFechaCreacionDesc(id);
+    public ResponseEntity<List<HistorialTirada>> obtenerHistorial(@PathVariable Long id) {
+        List<HistorialTirada> historial = historialRepository.findByUsuarioIdOrderByFechaCreacionDesc(id);
+        return ResponseEntity.ok(historial);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> borrarTirada(@PathVariable Long id) {
         try {
-            if (historialRepository.existsById(id)) {
-                historialRepository.deleteById(id);
-                return ResponseEntity.ok("Archivo eliminado correctamente.");
-            } else {
-                return ResponseEntity.notFound().build();
+            if (!historialRepository.existsById(id)) {
+                return ResponseEntity.status(404).body("No se encontró el archivo con ID: " + id);
             }
+
+            historialRepository.deleteById(id);
+            return ResponseEntity.ok("Archivo eliminado correctamente.");
+
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error al intentar eliminar el archivo.");
         }

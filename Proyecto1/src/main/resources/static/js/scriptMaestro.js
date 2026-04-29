@@ -5,6 +5,7 @@ let ultimoResultado = null; // Guardará el último cálculo hecho
  * 1. SIMULADOR: Ejecuta la simulación enviando los datos al backend
  */
 async function ejecutarSimulacion() {
+
     // 1. Recogemos los valores con los nombres exactos que espera tu DTO de Java
     const datosSimulacion = {
         numAtaques: parseInt(document.getElementById('numAtaques')?.value) || 0,
@@ -33,6 +34,10 @@ async function ejecutarSimulacion() {
         }
 
         const resultado = await response.json();
+
+        reproducirSonidoTerminal();
+
+
         ultimoResultado = resultado; 
 
         // 3. Mostramos los resultados reales
@@ -47,7 +52,6 @@ async function ejecutarSimulacion() {
         mostrarNotificacion("Error de cálculo: Verifica los datos introducidos", "error"); 
     }
 }
-
 
 /**
  * Pinta los números grandes en el centro de la pantalla
@@ -161,7 +165,7 @@ function cambiarPantalla(destino) {
 
     if (estaLogueado) {
         if (destino === 'unidades') cargarTarjetasUnidad();
-        if (destino === 'historial') cargarHistorialVisual();
+        if (destino === 'historial') cargarHistorialDefinitivo();
     }
 }
 
@@ -181,12 +185,14 @@ function activarEfectoCambioPantalla() {
     }, 500);
 }
 
+// Sonido de terminal para mejorar la experiencia al cambiar de pantalla o simular un ataque.
 function reproducirSonidoTerminal() {
-    const audio = new Audio('/sounds/terminal-click.mp3');
-    audio.volume = 0.18;
-    audio.play().catch(() => {
-        // El navegador puede bloquear audio si el usuario no ha interactuado aún.
-    });
+    const audio = new Audio('/sounds/750435__rescopicsound__ui-click-menu-modern-interface-select-small-01.mp3');
+    audio.volume = 0.3;
+
+    audio.play()
+        .then(() => console.log("🔊 Sonido reproducido"))
+        .catch(error => console.error("❌ Error al reproducir sonido:", error));
 }
 
 // Integración con el menú móvil (Paso 19)

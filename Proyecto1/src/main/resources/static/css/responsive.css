@@ -226,3 +226,10 @@
         transform: translateY(0);
     }
 }
+
+@media screen and (max-width: 768px) {
+    .btn-primary {
+        min-height: 75px;
+        font-size: 1.25em;
+    }
+}

@@ -64,7 +64,7 @@ async function cargarHistorialDefinitivo() {
         const tiradas = await response.json();
 
         if (tiradas.length === 0) {
-            lista.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-style: italic;">Los archivos están vacíos. Realiza tu primera tirada en el simulador.</p>';
+            lista.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-style: italic;">El registro están vacíos. Realiza tu primera tirada en el simulador.</p>';
             return;
         }
 
@@ -103,7 +103,7 @@ async function cargarHistorialDefinitivo() {
         
     } catch (e) {
         console.error("Error al recuperar los archivos:", e);
-        lista.innerHTML = '<p style="text-align:center; color:#e74c3c;">Error de conexión. No se pudieron cargar los archivos.</p>';
+        lista.innerHTML = '<p style="text-align:center; color:#e74c3c;">Error de conexión. No se pudo cargar el registro.</p>';
     }
 }
 
