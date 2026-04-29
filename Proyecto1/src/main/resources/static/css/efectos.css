@@ -45,3 +45,105 @@
         transform: rotate(360deg) scale(1); /* Vuelta completa y vuelve al tamaño original */
     }
 }
+
+/* ------------------------------------------------------ EFECTO HUD / GLITCH AL CAMBIAR PANTALLA --- */
+
+.content-area {
+    position: relative;
+}
+
+.hud-transition {
+    animation: hud-glitch 0.35s ease-out;
+}
+
+.hud-transition::before {
+    content: "";
+    position: fixed;
+    inset: 70px 250px 0 200px;
+    pointer-events: none;
+    z-index: 999;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(0, 255, 80, 0.12) 48%,
+        rgba(0, 255, 80, 0.45) 50%,
+        rgba(0, 255, 80, 0.12) 52%,
+        transparent 100%
+    );
+    animation: scan-line 0.45s linear;
+}
+
+.hud-transition::after {
+    content: "TACTICAL DATA LINK // SYNC";
+    position: fixed;
+    top: 90px;
+    right: 280px;
+    color: var(--accent-glow);
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    text-shadow: 0 0 8px var(--accent-glow);
+    z-index: 1000;
+    animation: hud-text-flicker 0.45s steps(2);
+}
+
+.pantalla-activa {
+    animation: pantalla-hud-in 0.28s ease-out;
+}
+
+@keyframes scan-line {
+    from {
+        transform: translateY(-120%);
+        opacity: 0;
+    }
+    20% {
+        opacity: 1;
+    }
+    to {
+        transform: translateY(120%);
+        opacity: 0;
+    }
+}
+
+@keyframes hud-glitch {
+    0% {
+        filter: contrast(1) brightness(1);
+        transform: translateX(0);
+    }
+    20% {
+        filter: contrast(1.4) brightness(1.3) hue-rotate(20deg);
+        transform: translateX(-2px);
+    }
+    40% {
+        transform: translateX(3px);
+    }
+    60% {
+        filter: contrast(1.2) brightness(1.1);
+        transform: translateX(-1px);
+    }
+    100% {
+        filter: none;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pantalla-hud-in {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.985);
+        filter: blur(2px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        filter: blur(0);
+    }
+}
+
+@keyframes hud-text-flicker {
+    0%, 100% {
+        opacity: 0;
+    }
+    25%, 50%, 75% {
+        opacity: 1;
+    }
+}

@@ -1,14 +1,29 @@
 /* =========================================================
-   GUERRA MÓVIL: Pantallas menores de 1024px (Tablets)
+   RESPONSIVE GENERAL
 ========================================================= */
+
 @media screen and (max-width: 1024px) {
-    /* Rompemos las 3 columnas y hacemos que todo fluya hacia abajo */
+
+    body {
+        height: auto;
+        min-height: 100vh;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
     .main-layout {
         display: flex;
         flex-direction: column;
+        min-height: auto;
+        overflow: visible;
     }
 
-    /* Las barras laterales ahora ocupan el 100% del ancho y se apilan */
+    .content-area {
+        width: 100%;
+        padding: 15px;
+        overflow: visible;
+    }
+
     .sidebar {
         width: 100%;
         border-right: none;
@@ -16,35 +31,98 @@
         padding: 15px;
     }
 
-    /* El contenido central pierde los márgenes laterales */
-    .content-area {
+    .right-sidebar {
         width: 100%;
-        padding: 10px;
+        border-left: none;
+        border-top: 1px solid var(--border-dark);
+    }
+
+    .simulator-card {
+        max-width: 100%;
+    }
+
+    .menu-btn {
+        display: block;
+    }
+
+    .left-sidebar {
+        display: none;
+        width: 100%;
+        position: fixed;
+        top: 70px;
+        left: 0;
+        z-index: 1000;
+        background: var(--bg-panels);
+        border-bottom: 2px solid var(--accent);
+        max-height: calc(100vh - 70px);
+        overflow-y: auto;
+    }
+
+    .left-sidebar.active {
+        display: block !important;
+        animation: fadeInDown 0.3s ease;
     }
 }
 
+
 /* =========================================================
-   GUERRA DE TRINCHERAS: Pantallas menores de 768px (Móviles)
+   MÓVIL
 ========================================================= */
+
 @media screen and (max-width: 768px) {
-    /* 1. HEADER: Centramos el logo y el estado de la conexión */
+
     .main-header {
-        flex-direction: column;
+        height: auto;
+        min-height: 70px;
+        padding: 10px 12px;
+        flex-direction: row;
         align-items: center;
-        gap: 15px;
-        padding: 15px;
-        text-align: center;
     }
 
-    /* 2. FORMULARIOS: Forzamos a que todos los inputs vayan a 1 sola columna */
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .header-center {
+        display: none;
+    }
+
+    .header-right {
+        display: none;
+    }
+
+    .logo-text {
+        font-size: 1.1rem;
+        letter-spacing: 1px;
+    }
+
+    .logo-text span {
+        font-size: 0.7rem;
+    }
+
+    .left-sidebar {
+        top: 70px;
+    }
+
+    .content-area {
+        padding: 10px;
+    }
+
+    .card-header,
+    .card-body,
+    .card-footer {
+        padding: 15px;
+    }
+
     .input-grid {
         grid-template-columns: 1fr !important;
         gap: 10px;
     }
 
-    /* 3. RESULTADOS: Apilamos la tirada aleatoria y la estadística */
     #contenedorResultados {
-        flex-direction: column;
+        flex-direction: column !important;
         gap: 10px;
     }
 
@@ -53,22 +131,68 @@
         text-align: center;
     }
 
-    /* 4. BOTONES: Los hacemos grandes y fáciles de pulsar con el pulgar */
-    .btn-primary {
-        width: 100%;
-        padding: 15px;
-        font-size: 1.1em;
+    .display-resultados {
+        font-size: 2.4em !important;
     }
 
-    /* 5. TARJETAS DE UNIDAD: Nos aseguramos de que ocupen todo el ancho */
+    .btn-primary {
+        width: 100%;
+        min-height: 48px;
+        font-size: 1em;
+    }
+
     #lista-tarjetas-unidad {
         grid-template-columns: 1fr !important;
     }
+
+    #panel-guardar-tirada,
+    #contenedorResultados {
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
 }
 
-/* Estilos para el botón (solo se ve en móvil) */
+
+/* =========================================================
+   MÓVILES MUY ESTRECHOS
+========================================================= */
+
+@media screen and (max-width: 420px) {
+
+    .logo-text {
+        font-size: 1rem;
+    }
+
+    .menu-btn {
+        font-size: 1.2rem;
+        padding: 4px 8px;
+    }
+
+    .content-area {
+        padding: 6px;
+    }
+
+    .step-group {
+        padding: 10px;
+    }
+
+    .display-resultados {
+        font-size: 2em !important;
+    }
+
+    #quick-stats div {
+        font-size: 0.85rem;
+    }
+}
+
+
+/* =========================================================
+   BOTÓN MENÚ
+========================================================= */
+
 .menu-btn {
-    display: none; /* Oculto en escritorio */
+    display: none;
     background: transparent;
     border: 1px solid var(--accent);
     color: var(--accent);
@@ -82,29 +206,23 @@
 
 @media screen and (max-width: 1024px) {
     .menu-btn {
-        display: block; /* Aparece en móviles/tablets */
-    }
-
-    /* La barra lateral ahora está oculta por defecto en móvil */
-    .left-sidebar {
-        display: none; 
-        width: 100%;
-        position: absolute; /* Para que flote sobre el contenido */
-        top: 70px; /* Debajo del header */
-        left: 0;
-        z-index: 1000;
-        background: var(--bg-panels);
-        border-bottom: 2px solid var(--accent);
-    }
-
-    /* Clase que activaremos con JS para mostrarla */
-    .left-sidebar.active {
-        display: block !important;
-        animation: fadeInDown 0.3s ease;
+        display: block;
     }
 }
 
+
+/* =========================================================
+   ANIMACIONES
+========================================================= */
+
 @keyframes fadeInDown {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

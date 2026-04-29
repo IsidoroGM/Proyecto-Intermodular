@@ -1,72 +1,135 @@
-/*---------------------------------------------------------------------------------------TIPOGRAFIA*/
+/* =========================================================
+   TIPOGRAFÍA
+========================================================= */
 
 @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
 
-/*---------------------------------------------------------------------------------------TIPOGRAFIA*/
 
+/* =========================================================
+   VARIABLES DE TEMA
+========================================================= */
 
-/* ------------------------------------------------------ VARIABLES DE TEMA (Estilo Dark/Glow) --- */
 :root {
-    --bg-main: #151515;       /* Fondo principal web */
-    --bg-panels: #1b1b1b;     /* Fondo de cabecera, sidebars y tarjetas */
-    --text-main: #c7c7c7;     /* Texto principal claro */
-    --text-muted: #868686;    /* Texto secundario/labels oscuro */
+    --bg-main: #151515;
+    --bg-panels: #1b1b1b;
+
+    --text-main: #c7c7c7;
+    --text-muted: #868686;
+
     --border-dark: #272727;
     --border-input: #444;
+
     --input-gradient: linear-gradient(#333, #222);
-    
-    /* Configuración Neón (Verde estilo CodingStella) */
+
     --accent: #3cff6b;
     --accent-glow: #00ff88;
+
     --glow-shadow: rgba(0, 255, 0, 0.2);
     --glow-shadow-strong: rgba(0, 255, 0, 0.6);
-    --hud-line: rgba(0,255,100,0.25);
-    --hud-strong: rgba(0,255,100,0.6);
+
+    --hud-line: rgba(0, 255, 100, 0.25);
+    --hud-strong: rgba(0, 255, 100, 0.6);
+
     --panel-dark: rgba(10, 20, 10, 0.7);
 
-    /* --- LIQUID GLASS EFFECT --- */
     --glass-bg: rgba(255, 255, 255, 0.03);
     --glass-border: rgba(255, 255, 255, 0.08);
     --glass-highlight: rgba(255, 255, 255, 0.06);
     --glass-blur: 10px;
 }
-/* ------------------------------------------------------ VARIABLES DE TEMA (Estilo Dark/Glow) --- */
 
-/* Configuración Global */
+
+/* =========================================================
+   CONFIGURACIÓN GLOBAL
+========================================================= */
+
 * {
     margin: 0;
     padding: 0;
-    font-family: "Poppins", sans-serif;
     box-sizing: border-box;
+    font-family: inherit;
 }
 
 body {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
+    overflow-x: hidden;
+
     color: var(--text-main);
     font-family: 'Share Tech Mono', monospace;
     letter-spacing: 0.5px;
 
-    background: radial-gradient(circle at 20% 20%, #1f2a1f, #151515 60%);
+    background: var(--bg-main);
 }
 
-.screen-panel {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
+
+/* =========================================================
+   FONDO ANIMADO
+========================================================= */
+
+.bg-effects {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+
+    background: #151515;
 }
 
-/*-------------------------HEADER-------------------------------*/
+.bg-effects::before,
+.bg-effects::after {
+    content: "";
+    position: absolute;
+
+    width: 600px;
+    height: 600px;
+
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.25;
+}
+
+.bg-effects::before {
+    top: 10%;
+    left: 10%;
+
+    background: #00ff88;
+    animation: float1 12s infinite ease-in-out;
+}
+
+.bg-effects::after {
+    right: 10%;
+    bottom: 10%;
+
+    background: #00cc66;
+    animation: float2 14s infinite ease-in-out;
+}
+
+@keyframes float1 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(80px, 40px); }
+}
+
+@keyframes float2 {
+    0%, 100% { transform: translate(0, 0); }
+    50% { transform: translate(-60px, -30px); }
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
 .main-header {
     position: relative;
+
     display: flex;
     justify-content: space-between;
     align-items: center;
 
-    padding: 0 20px;
     height: 70px;
+    padding: 0 20px;
 
     background: rgba(27, 27, 27, 0.65);
     backdrop-filter: blur(12px);
@@ -76,45 +139,82 @@ body {
     box-shadow: inset 0 -1px 2px var(--border-dark);
 }
 
-.header-left, .header-right { flex: 1; }
+.header-left,
+.header-right {
+    flex: 1;
+}
+
 .header-center {
     flex: 0;
+
     display: flex;
     justify-content: center;
 }
+
 .header-right {
     display: flex;
     justify-content: flex-end;
+
     color: var(--text-muted);
 }
 
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--text-main);
+    letter-spacing: 2px;
+}
+
+.logo-text span {
+    color: var(--accent);
+    font-size: 0.8rem;
+}
+
 #web-icon {
+    display: block;
+
     height: 55px;
     width: auto;
-    display: block;
+
     transition: transform 0.3s ease;
 }
+
 #web-icon:hover {
     transform: scale(1.1);
-    filter: drop-shadow(0 0 8px var(--accent)); /* Brillo al logo */
+    filter: drop-shadow(0 0 8px var(--accent));
 }
 
-.logo-text { font-size: 1.5rem; font-weight: bold; letter-spacing: 2px; color: var(--text-main); }
-.logo-text span { color: var(--accent); font-size: 0.8rem; }
 
-/* Layout Principal */
+/* =========================================================
+   LAYOUT PRINCIPAL
+========================================================= */
+
 .main-layout {
     display: flex;
     flex: 1;
     overflow: hidden;
 }
 
-/* Sidebars Generales */
+.content-area {
+    flex: 1;
+
+    padding: 30px;
+    overflow-y: auto;
+
+    background: transparent;
+}
+
+
+/* =========================================================
+   SIDEBARS
+========================================================= */
+
 .sidebar {
     flex-shrink: 0;
+
     width: 200px;
     padding: 20px;
-    overflow-y: auto; 
+    overflow-y: auto;
 
     background: rgba(27, 27, 27, 0.55);
     backdrop-filter: blur(10px);
@@ -123,67 +223,95 @@ body {
     border-right: 1px solid var(--glass-border);
     box-shadow: inset -1px 0 2px var(--border-dark);
 }
-.right-sidebar { 
+
+.right-sidebar {
     width: 250px;
-    flex-shrink: 0;
-    border-left: 1px solid var(--glass-border);
+
     border-right: none;
-    /* box-shadow: inset 1px 0 2px var(--border-dark); */
-    
+    border-left: 1px solid var(--glass-border);
+    box-shadow: none;
 }
 
-.sidebar h3 { 
-    font-size: 0.9rem; 
-    text-transform: uppercase; 
-    color: var(--text-muted); 
+.sidebar h3 {
     margin-bottom: 15px;
+
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-transform: uppercase;
     letter-spacing: 1px;
 }
 
-/* Estilo de enlaces en sidebar */
-.sidebar ul { list-style: none; padding: 0; }
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
 .sidebar ul li a {
     display: block;
+
+    margin-bottom: 5px;
     padding: 10px;
+
     color: var(--text-muted);
     text-decoration: none;
-    border-radius: 5px;
-    margin-bottom: 5px;
-    transition: 0.3s;
+
     border: 1px solid transparent;
+    border-radius: 5px;
+
+    transition: 0.3s;
 }
-.sidebar ul li a.active, .sidebar ul li a:hover {
+
+.sidebar ul li a.active,
+.sidebar ul li a:hover {
     color: var(--accent);
+
     background: var(--input-gradient);
     border: 1px solid var(--border-input);
     box-shadow: 0 0 5px var(--glow-shadow);
 }
 
-/* Área de Contenido Central */
-.content-area {
-    flex: 1;
-    padding: 30px;
-    background: transparent; 
-    overflow-y: auto;
+
+/* =========================================================
+   PANTALLAS / VISIBILIDAD
+========================================================= */
+
+.pantalla-oculta {
+    display: none !important;
 }
 
-/*-------------------------------------------------------------------------- Estilos de la Tarjeta del Simulador */
-.simulator-card {
-    position: relative;
+.pantalla-activa {
+    display: block !important;
+}
+
+.screen-panel {
     max-width: 800px;
     margin: 0 auto;
+    padding: 20px;
+}
+
+
+/* =========================================================
+   TARJETAS / PANELES HUD
+========================================================= */
+
+.simulator-card {
+    position: relative;
+
+    max-width: 800px;
+    margin: 0 auto;
+
     border-radius: 2px;
+    border: 1px solid var(--hud-line);
 
     background: var(--panel-dark);
     backdrop-filter: blur(18px);
     -webkit-backdrop-filter: blur(18px);
 
-    border: 1px solid var(--hud-line);
-
-
     box-shadow:
-        inset 0 0 10px rgba(0,255,100,0.05),
-        0 0 25px rgba(0,0,0,0.8);
+        inset 0 0 10px rgba(0, 255, 100, 0.05),
+        0 0 25px rgba(0, 0, 0, 0.8);
+
+    transition: 0.4s ease;
 }
 
 .simulator-card::before {
@@ -203,7 +331,6 @@ body {
     pointer-events: none;
 }
 
-/* Brillo en movimiento */
 .simulator-card::after {
     content: "";
     position: absolute;
@@ -213,33 +340,82 @@ body {
         to bottom,
         transparent,
         transparent 2px,
-        rgba(0,255,100,0.03) 3px
+        rgba(0, 255, 100, 0.03) 3px
     );
 
     pointer-events: none;
 }
 
-@keyframes glass-shine {
-    0% { transform: translateX(-100%) rotate(25deg); }
-    100% { transform: translateX(100%) rotate(25deg); }
-}
-
 .simulator-card:hover {
     transform: translateY(-5px) scale(1.01);
-    transition: 0.4s ease;
 
     box-shadow:
-        inset 0 1px 1px rgba(255,255,255,0.08),
-        0 20px 60px rgba(0,0,0,0.9),
-        0 0 25px rgba(0,255,100,0.15);
+        inset 0 1px 1px rgba(255, 255, 255, 0.08),
+        0 20px 60px rgba(0, 0, 0, 0.9),
+        0 0 25px rgba(0, 255, 100, 0.15);
 }
 
-.step-group {
-    background: rgba(0, 20, 0, 0.4);
-    border: 1px solid var(--hud-line);
-    border-radius: 2px;
+.card-header {
+    padding: 20px;
 
+    text-align: center;
+
+    border-bottom: 1px solid black;
+}
+
+.card-header h2 {
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.card-header p {
+    color: var(--text-muted);
+    font-size: 0.8rem;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-footer {
+    padding: 20px;
+
+    text-align: center;
+
+    border-top: 1px solid black;
+}
+
+.hud-label {
+    position: absolute;
+    top: -18px;
+    left: 12px;
+
+    color: var(--accent);
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+
+    opacity: 0.7;
+}
+
+
+/* =========================================================
+   FIELDSETS / BLOQUES DE FORMULARIO
+========================================================= */
+
+.step-group {
     position: relative;
+
+    margin-bottom: 20px;
+    padding: 15px;
+
+    background: rgba(27, 27, 27, 0.35);
+    backdrop-filter: blur(8px);
+
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+
+    transition: 0.3s;
 }
 
 .step-group::before {
@@ -250,135 +426,36 @@ body {
 
     width: 40px;
     height: 2px;
+
     background: var(--accent);
 }
 
 .step-group:hover {
-    border-color: rgba(0,255,100,0.4);
-    box-shadow: 0 0 15px rgba(0,255,100,0.1);
-}
-
-    /* ---------------------------------------------------------------------------TARJETA SIMULADOR */
-/*--------------------------------------------------------------------------------BOTON-------------*/
-.btn-primary {
-    position: relative;
-    overflow: hidden;
-}
-
-/* Energía en movimiento */
-.btn-primary::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-
-    background: linear-gradient(
-        120deg,
-        transparent,
-        rgba(0,255,100,0.2),
-        transparent
-    );
-
-    transform: translateX(-100%);
-}
-
-.btn-primary:hover::before {
-    animation: energy 1.2s ease;
-}
-
-@keyframes energy {
-    to {
-        transform: translateX(100%);
-    }
-}
-/*--------------------------------------------------------------------------------BOTON-------------*/
-
-.card-header { padding: 20px; border-bottom: 1px solid black; text-align: center; }
-.card-header h2 {
-    text-transform: uppercase;
-    color: var(--accent);
-    letter-spacing: 2px;
-}
-
-.card-header p {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-}
-
-.card-body { padding: 20px; }
-
-/* Agrupación por fases */
-.step-group {
-    position: relative;
-    border-radius: 6px;
-    padding: 15px;
-    margin-bottom: 20px;
-
-    background: rgba(27, 27, 27, 0.35);
-    backdrop-filter: blur(8px);
-
-    border: 1px solid var(--glass-border);
+    border-color: rgba(0, 255, 100, 0.4);
+    box-shadow: 0 0 15px rgba(0, 255, 100, 0.1);
 }
 
 .step-group legend {
-    font-weight: 600;
-    color: var(--accent);
     padding: 0 10px;
+
+    color: var(--accent);
     font-size: 0.9rem;
+    font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 1px;
 }
 
-/* Rejilla de inputs */
+
+/* =========================================================
+   FORMULARIOS / INPUTS
+========================================================= */
+
 .input-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 15px;
 }
 
-.field label {
-    display: block;
-    font-size: 0.7rem;
-    margin-bottom: 6px;
-
-    color: var(--hud-line);
-
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-/* Inputs y Selects GLOW */
-.field input[type="number"],
-.field select {
-    height: 45px;
-    width: 100%;
-    padding: 0 12px;
-
-    font-size: 14px;
-    font-family: 'Share Tech Mono', monospace;
-
-    color: var(--accent);
-
-    background: rgba(0, 0, 0, 0.7);
-
-    border: 1px solid var(--hud-line);
-    border-radius: 2px;
-
-    outline: none;
-
-    transition: all 0.2s ease;
-
-    box-shadow: inset 0 0 6px rgba(0,255,100,0.05);
-}
-.field input[type="number"]:focus,
-.field select:focus {
-    border-color: var(--accent);
-
-    background: rgba(0, 20, 0, 0.85);
-
-    box-shadow:
-        0 0 8px rgba(0,255,100,0.4),
-        inset 0 0 10px rgba(0,255,100,0.1);
-}
 .field {
     position: relative;
 }
@@ -401,23 +478,73 @@ body {
     width: 100%;
 }
 
-/* Animación de Brillo importada de tu ejemplo */
-@keyframes glow {
-    0% {
-        border-color: var(--accent);
-        box-shadow: 0 0 5px var(--glow-shadow), inset 0 0 5px rgba(0, 0, 0, 0.1);
-    }
-    100% {
-        border-color: var(--accent-glow);
-        box-shadow: 0 0 15px var(--glow-shadow-strong), inset 0 0 10px var(--glow-shadow);
-    }
+.field label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    color: var(--hud-line);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-.full-width { grid-column: 1 / -1; }
+.field input,
+.field select,
+.field textarea {
+    width: 100%;
+
+    color: var(--accent);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+
+    background: rgba(0, 0, 0, 0.7);
+
+    border: 1px solid var(--hud-line);
+    border-radius: 2px;
+    outline: none;
+
+    transition: all 0.2s ease;
+
+    box-shadow: inset 0 0 6px rgba(0, 255, 100, 0.05);
+}
+
+.field input,
+.field select {
+    height: 45px;
+    padding: 0 12px;
+}
+
+.field textarea {
+    min-height: 90px;
+    padding: 12px;
+    resize: vertical;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+    background: rgba(0, 20, 0, 0.85);
+    border-color: var(--accent);
+
+    box-shadow:
+        0 0 8px rgba(0, 255, 100, 0.4),
+        inset 0 0 10px rgba(0, 255, 100, 0.1);
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+
+/* =========================================================
+   CHECKBOXES
+========================================================= */
 
 .checkbox-container {
     display: flex;
     align-items: flex-end;
+
     padding-bottom: 10px;
 }
 
@@ -425,228 +552,114 @@ body {
     display: flex !important;
     align-items: center;
     gap: 10px;
-    cursor: pointer;
-    font-weight: normal !important;
+
     color: var(--text-muted);
+    font-weight: normal !important;
+
+    cursor: pointer;
 }
+
 .checkbox-label input[type="checkbox"] {
     width: 18px;
     height: 18px;
+
     accent-color: var(--accent);
+
     cursor: pointer;
 }
 
-/* Botón GLOW */
-.card-footer { padding: 20px; border-top: 1px solid black; text-align: center; }
+
+/* =========================================================
+   BOTONES
+========================================================= */
 
 .btn-primary {
+    position: relative;
+    overflow: hidden;
+
     background: rgba(0, 0, 0, 0.8);
+
     border: 1px solid var(--accent);
+    border-radius: 2px;
+
     color: var(--accent);
 
     text-transform: uppercase;
     letter-spacing: 2px;
+
+    cursor: pointer;
+
+    transition: 0.3s;
 }
 
-
-.btn-primary:hover {
-    background: rgba(0,255,100,0.1);
-    box-shadow: 0 0 15px rgba(0,255,100,0.4);
-}
-
-/* Resultados Adaptados al modo oscuro */
-.results-area { margin-top: 25px; display: flex; flex-direction: column; gap: 10px; }
-
-.caja-resultado {
-    padding: 15px;
-    border-radius: 6px;
-    font-weight: bold;
-
-    background: rgba(27, 27, 27, 0.5);
-    backdrop-filter: blur(10px);
-
-    border: 1px solid var(--glass-border);
-}
-
-.aleatorio { border-left: 5px solid var(--accent); color: var(--text-main); }
-.estadistica { border-left: 5px solid #3498db; color: var(--text-main); }
-.error { border-left: 5px solid #e74c3c; color: var(--text-main); }
-
-/* Quick stats en sidebar derecha */
-#quick-stats div {
-    background: var(--input-gradient) !important;
-    border: 1px solid var(--border-input) !important;
-    color: var(--text-muted) !important;
-    border-radius: 5px;
-    margin-bottom: 10px;
-}
-#quick-stats div strong { color: var(--text-main); }
-
-
-/* CSS para ocultar/mostrar elementos de forma absoluta */
-.pantalla-oculta {
-    display: none !important;
-}
-
-.pantalla-activa {
-    display: block !important; /* O 'flex' si prefieres ese diseño */
-}
-
-/* --- BASE LIQUID GLASS --- */
-.glass {
-    background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: 1px solid var(--glass-border);
-    box-shadow: 
-        inset 0 1px 1px var(--glass-highlight),
-        0 8px 20px rgba(0,0,0,0.4);
-}
-
-/* Reflejo superior tipo cristal */
-.glass::before {
+.btn-primary::before {
     content: "";
     position: absolute;
     inset: 0;
-    border-radius: inherit;
+
     background: linear-gradient(
         120deg,
-        rgba(255,255,255,0.08),
-        transparent 40%
+        transparent,
+        rgba(0, 255, 100, 0.2),
+        transparent
     );
-    pointer-events: none;
+
+    transform: translateX(-100%);
 }
 
-.glass-panel {
-    background: rgba(27, 27, 27, 0.5);
-    backdrop-filter: blur(10px);
-    border: 1px solid var(--glass-border);
-    border-radius: 6px;
+.btn-primary:hover {
+    background: rgba(0, 255, 100, 0.1);
+    box-shadow: 0 0 15px rgba(0, 255, 100, 0.4);
+}
+
+.btn-primary:hover::before {
+    animation: energy 1.2s ease;
+}
+
+@keyframes energy {
+    to {
+        transform: translateX(100%);
+    }
 }
 
 
-
-.bg-effects {
-    position: fixed;
-    inset: 0;
-    z-index: -1;
-    overflow: hidden;
-
-    background: #151515;
-}
-
-.bg-effects::before,
-.bg-effects::after {
-    content: "";
-    position: absolute;
-    width: 600px;
-    height: 600px;
-    border-radius: 50%;
-    filter: blur(120px);
-    opacity: 0.25;
-}
-
-/* Mancha verde 1 */
-.bg-effects::before {
-    background: #00ff88;
-    top: 10%;
-    left: 10%;
-    animation: float1 12s infinite ease-in-out;
-}
-
-/* Mancha verde 2 */
-.bg-effects::after {
-    background: #00cc66;
-    bottom: 10%;
-    right: 10%;
-    animation: float2 14s infinite ease-in-out;
-}
-
-@keyframes float1 {
-    0%, 100% { transform: translate(0,0); }
-    50% { transform: translate(80px, 40px); }
-}
-
-@keyframes float2 {
-    0%, 100% { transform: translate(0,0); }
-    50% { transform: translate(-60px, -30px); }
-}
-
-.hud-label {
-    position: absolute;
-    top: -18px;
-    left: 12px;
-
-    font-size: 0.65rem;
-    color: var(--accent);
-    opacity: 0.7;
-
-    font-family: 'Share Tech Mono', monospace;
-    letter-spacing: 1px;
-}
+/* =========================================================
+   RESULTADOS DE SIMULACIÓN
+========================================================= */
 
 .results-panel {
-    margin-top: 25px;
-    padding: 15px;
+    position: relative;
 
     display: flex;
-    gap: 15px;
     flex-wrap: wrap;
+    gap: 15px;
+
+    margin-top: 25px;
+    padding: 15px;
 
     background: rgba(0, 20, 0, 0.4);
     backdrop-filter: blur(12px);
 
     border: 1px solid var(--hud-line);
     border-radius: 2px;
-
-    position: relative;
 }
 
 .resultado-box {
-    flex: 1;
-    min-width: 180px;
+    position: relative;
 
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 180px;
     padding: 15px;
 
     background: rgba(0, 0, 0, 0.6);
 
     border: 1px solid var(--hud-line);
     border-radius: 2px;
-
-    position: relative;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.resultado-label {
-    font-size: 0.7rem;
-    color: var(--hud-line);
-
-    text-transform: uppercase;
-    letter-spacing: 1px;
-
-    margin-bottom: 8px;
-}
-
-.resultado-valor {
-    font-size: 2.8rem;
-    font-weight: bold;
-    font-family: 'Share Tech Mono', monospace;
-}
-
-/* Verde - tirada */
-.resultado-aleatorio .resultado-valor {
-    color: var(--accent);
-    text-shadow: 0 0 10px rgba(0,255,100,0.6);
-}
-
-/* Azul - media */
-.resultado-estadistico .resultado-valor {
-    color: #3498db;
-    text-shadow: 0 0 10px rgba(52,152,219,0.6);
 }
 
 .resultado-box::before {
@@ -659,4 +672,93 @@ body {
     height: 2px;
 
     background: var(--accent);
+}
+
+.resultado-label {
+    margin-bottom: 8px;
+
+    color: var(--hud-line);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.resultado-valor {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 2.8rem;
+    font-weight: bold;
+}
+
+.resultado-aleatorio .resultado-valor {
+    color: var(--accent);
+    text-shadow: 0 0 10px rgba(0, 255, 100, 0.6);
+}
+
+.resultado-estadistico .resultado-valor {
+    color: #3498db;
+    text-shadow: 0 0 10px rgba(52, 152, 219, 0.6);
+}
+
+
+/* =========================================================
+   RESUMEN RÁPIDO
+========================================================= */
+
+#quick-stats div {
+    margin-bottom: 10px;
+
+    color: var(--text-muted) !important;
+
+    background: var(--input-gradient) !important;
+
+    border: 1px solid var(--border-input) !important;
+    border-radius: 5px;
+}
+
+#quick-stats div strong {
+    color: var(--text-main);
+}
+
+
+/* =========================================================
+   UTILIDADES GLASS
+========================================================= */
+
+.glass {
+    background: var(--glass-bg);
+
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+
+    border: 1px solid var(--glass-border);
+
+    box-shadow:
+        inset 0 1px 1px var(--glass-highlight),
+        0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    border-radius: inherit;
+
+    background: linear-gradient(
+        120deg,
+        rgba(255, 255, 255, 0.08),
+        transparent 40%
+    );
+
+    pointer-events: none;
+}
+
+.glass-panel {
+    background: rgba(27, 27, 27, 0.5);
+
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
 }

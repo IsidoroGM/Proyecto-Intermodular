@@ -139,32 +139,54 @@ function cambiarPantalla(destino) {
 
     if (pantallasProtegidas.includes(destino) && !estaLogueado) {
         mostrarNotificacion("⚠️ Debes iniciar sesión para acceder a esta sección.", "error");
-        return; 
+        return;
     }
 
-    // Ocultar todas las pantallas
-    document.querySelectorAll('.pantalla-seccion').forEach(el => {
+    activarEfectoCambioPantalla();
+
+    document.querySelectorAll('.pantalla-seccion, #pantalla-simulador, #pantalla-unidades, #pantalla-historial').forEach(el => {
         el.classList.remove('pantalla-activa');
         el.classList.add('pantalla-oculta');
     });
 
-    // Activar pantalla destino
     const pantallaDestino = document.getElementById(`pantalla-${destino}`);
     if (pantallaDestino) {
         pantallaDestino.classList.remove('pantalla-oculta');
         pantallaDestino.classList.add('pantalla-activa');
     }
 
-    // Actualizar menú activo
     document.querySelectorAll('.sidebar ul li a').forEach(el => el.classList.remove('active'));
     const menuDestino = document.getElementById(`menu-${destino}`);
     if (menuDestino) menuDestino.classList.add('active');
 
-    // Cargar datos específicos si es necesario
     if (estaLogueado) {
         if (destino === 'unidades') cargarTarjetasUnidad();
         if (destino === 'historial') cargarHistorialVisual();
     }
+}
+
+// Efecto visual de transición entre pantallas
+function activarEfectoCambioPantalla() {
+    const contentArea = document.querySelector('.content-area');
+    if (!contentArea) return;
+
+    reproducirSonidoTerminal();
+
+    contentArea.classList.remove('hud-transition');
+    void contentArea.offsetWidth;
+    contentArea.classList.add('hud-transition');
+
+    setTimeout(() => {
+        contentArea.classList.remove('hud-transition');
+    }, 500);
+}
+
+function reproducirSonidoTerminal() {
+    const audio = new Audio('/sounds/terminal-click.mp3');
+    audio.volume = 0.18;
+    audio.play().catch(() => {
+        // El navegador puede bloquear audio si el usuario no ha interactuado aún.
+    });
 }
 
 // Integración con el menú móvil (Paso 19)
