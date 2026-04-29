@@ -1,6 +1,11 @@
-@import url("https://fonts.googleapis.com/css?family=Poppins&display=swap");
+/*---------------------------------------------------------------------------------------TIPOGRAFIA*/
 
-/* --- VARIABLES DE TEMA (Estilo Dark/Glow) --- */
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+
+/*---------------------------------------------------------------------------------------TIPOGRAFIA*/
+
+
+/* ------------------------------------------------------ VARIABLES DE TEMA (Estilo Dark/Glow) --- */
 :root {
     --bg-main: #151515;       /* Fondo principal web */
     --bg-panels: #1b1b1b;     /* Fondo de cabecera, sidebars y tarjetas */
@@ -11,11 +16,21 @@
     --input-gradient: linear-gradient(#333, #222);
     
     /* Configuración Neón (Verde estilo CodingStella) */
-    --accent: #339933;        
-    --accent-glow: #6f6;
+    --accent: #3cff6b;
+    --accent-glow: #00ff88;
     --glow-shadow: rgba(0, 255, 0, 0.2);
     --glow-shadow-strong: rgba(0, 255, 0, 0.6);
+    --hud-line: rgba(0,255,100,0.25);
+    --hud-strong: rgba(0,255,100,0.6);
+    --panel-dark: rgba(10, 20, 10, 0.7);
+
+    /* --- LIQUID GLASS EFFECT --- */
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --glass-highlight: rgba(255, 255, 255, 0.06);
+    --glass-blur: 10px;
 }
+/* ------------------------------------------------------ VARIABLES DE TEMA (Estilo Dark/Glow) --- */
 
 /* Configuración Global */
 * {
@@ -30,19 +45,34 @@ body {
     flex-direction: column;
     height: 100vh;
     overflow: hidden;
-    background: var(--bg-main);
     color: var(--text-main);
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 0.5px;
+
+    background: radial-gradient(circle at 20% 20%, #1f2a1f, #151515 60%);
+}
+
+.screen-panel {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
 /*-------------------------HEADER-------------------------------*/
 .main-header {
+    position: relative;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--bg-panels);
+
     padding: 0 20px;
     height: 70px;
-    border-bottom: 1px solid black;
+
+    background: rgba(27, 27, 27, 0.65);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    border-bottom: 1px solid var(--glass-border);
     box-shadow: inset 0 -1px 2px var(--border-dark);
 }
 
@@ -81,18 +111,25 @@ body {
 
 /* Sidebars Generales */
 .sidebar {
-    background-color: var(--bg-panels);
+    flex-shrink: 0;
     width: 200px;
     padding: 20px;
-    border-right: 1px solid black;
+    overflow-y: auto; 
+
+    background: rgba(27, 27, 27, 0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    border-right: 1px solid var(--glass-border);
     box-shadow: inset -1px 0 2px var(--border-dark);
-    overflow-y: auto;
 }
 .right-sidebar { 
-    border-left: 1px solid black; 
+    width: 250px;
+    flex-shrink: 0;
+    border-left: 1px solid var(--glass-border);
     border-right: none;
-    box-shadow: inset 1px 0 2px var(--border-dark);
-    width: 250px; 
+    /* box-shadow: inset 1px 0 2px var(--border-dark); */
+    
 }
 
 .sidebar h3 { 
@@ -126,34 +163,162 @@ body {
 .content-area {
     flex: 1;
     padding: 30px;
-    background-color: var(--bg-main);
+    background: transparent; 
     overflow-y: auto;
 }
 
-/* Estilos de la Tarjeta del Simulador */
+/*-------------------------------------------------------------------------- Estilos de la Tarjeta del Simulador */
 .simulator-card {
-    background: var(--bg-panels);
-    border-radius: 5px;
+    position: relative;
     max-width: 800px;
     margin: 0 auto;
-    border: 1px solid black;
-    box-shadow: inset 0 0 2px var(--border-dark), 0 5px 15px rgba(0,0,0,0.5);
+    border-radius: 2px;
+
+    background: var(--panel-dark);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    border: 1px solid var(--hud-line);
+
+
+    box-shadow:
+        inset 0 0 10px rgba(0,255,100,0.05),
+        0 0 25px rgba(0,0,0,0.8);
 }
 
+.simulator-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    border: 1px solid var(--hud-strong);
+
+    clip-path: polygon(
+        0 10px, 10px 0,
+        calc(100% - 10px) 0, 100% 10px,
+        100% calc(100% - 10px), calc(100% - 10px) 100%,
+        10px 100%, 0 calc(100% - 10px)
+    );
+
+    pointer-events: none;
+}
+
+/* Brillo en movimiento */
+.simulator-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 2px,
+        rgba(0,255,100,0.03) 3px
+    );
+
+    pointer-events: none;
+}
+
+@keyframes glass-shine {
+    0% { transform: translateX(-100%) rotate(25deg); }
+    100% { transform: translateX(100%) rotate(25deg); }
+}
+
+.simulator-card:hover {
+    transform: translateY(-5px) scale(1.01);
+    transition: 0.4s ease;
+
+    box-shadow:
+        inset 0 1px 1px rgba(255,255,255,0.08),
+        0 20px 60px rgba(0,0,0,0.9),
+        0 0 25px rgba(0,255,100,0.15);
+}
+
+.step-group {
+    background: rgba(0, 20, 0, 0.4);
+    border: 1px solid var(--hud-line);
+    border-radius: 2px;
+
+    position: relative;
+}
+
+.step-group::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 40px;
+    height: 2px;
+    background: var(--accent);
+}
+
+.step-group:hover {
+    border-color: rgba(0,255,100,0.4);
+    box-shadow: 0 0 15px rgba(0,255,100,0.1);
+}
+
+    /* ---------------------------------------------------------------------------TARJETA SIMULADOR */
+/*--------------------------------------------------------------------------------BOTON-------------*/
+.btn-primary {
+    position: relative;
+    overflow: hidden;
+}
+
+/* Energía en movimiento */
+.btn-primary::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(0,255,100,0.2),
+        transparent
+    );
+
+    transform: translateX(-100%);
+}
+
+.btn-primary:hover::before {
+    animation: energy 1.2s ease;
+}
+
+@keyframes energy {
+    to {
+        transform: translateX(100%);
+    }
+}
+/*--------------------------------------------------------------------------------BOTON-------------*/
+
 .card-header { padding: 20px; border-bottom: 1px solid black; text-align: center; }
-.card-header h2 { margin: 0; color: var(--text-main); letter-spacing: 2px; }
-.card-header p { margin: 5px 0 0; color: var(--text-muted); font-size: 0.9rem; }
+.card-header h2 {
+    text-transform: uppercase;
+    color: var(--accent);
+    letter-spacing: 2px;
+}
+
+.card-header p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
 
 .card-body { padding: 20px; }
 
 /* Agrupación por fases */
 .step-group {
-    border: 1px solid var(--border-input);
-    border-radius: 5px;
+    position: relative;
+    border-radius: 6px;
     padding: 15px;
     margin-bottom: 20px;
-    background: #181818;
+
+    background: rgba(27, 27, 27, 0.35);
+    backdrop-filter: blur(8px);
+
+    border: 1px solid var(--glass-border);
 }
+
 .step-group legend {
     font-weight: 600;
     color: var(--accent);
@@ -172,30 +337,68 @@ body {
 
 .field label {
     display: block;
-    font-size: 0.85rem;
-    margin-bottom: 5px;
-    color: var(--text-muted);
+    font-size: 0.7rem;
+    margin-bottom: 6px;
+
+    color: var(--hud-line);
+
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 /* Inputs y Selects GLOW */
-.field input[type="number"], .field select {
+.field input[type="number"],
+.field select {
     height: 45px;
     width: 100%;
+    padding: 0 12px;
+
+    font-size: 14px;
+    font-family: 'Share Tech Mono', monospace;
+
+    color: var(--accent);
+
+    background: rgba(0, 0, 0, 0.7);
+
+    border: 1px solid var(--hud-line);
+    border-radius: 2px;
+
     outline: none;
-    font-size: 16px;
-    color: var(--text-muted);
-    padding: 0 15px;
-    border-radius: 5px;
-    border: 1px solid var(--border-input);
-    background: var(--input-gradient);
-    caret-color: var(--accent);
-    transition: 0.3s;
+
+    transition: all 0.2s ease;
+
+    box-shadow: inset 0 0 6px rgba(0,255,100,0.05);
+}
+.field input[type="number"]:focus,
+.field select:focus {
+    border-color: var(--accent);
+
+    background: rgba(0, 20, 0, 0.85);
+
+    box-shadow:
+        0 0 8px rgba(0,255,100,0.4),
+        inset 0 0 10px rgba(0,255,100,0.1);
+}
+.field {
+    position: relative;
 }
 
-.field input[type="number"]:focus, .field select:focus {
-    color: var(--accent);
-    background: linear-gradient(#2a332a, #1a221a); /* Un fondo levemente verdoso */
-    animation: glow 0.8s ease-out infinite alternate;
+.field::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+
+    width: 0%;
+    height: 1px;
+
+    background: var(--accent);
+
+    transition: width 0.3s ease;
+}
+
+.field:focus-within::after {
+    width: 100%;
 }
 
 /* Animación de Brillo importada de tu ejemplo */
@@ -237,28 +440,34 @@ body {
 .card-footer { padding: 20px; border-top: 1px solid black; text-align: center; }
 
 .btn-primary {
-    height: 50px;
-    width: 100%;
-    background: var(--input-gradient);
-    color: var(--text-muted);
-    border: 1px solid var(--border-input);
-    border-radius: 5px;
-    font-size: 1.1em;
-    font-weight: 600;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: 0.3s;
+    background: rgba(0, 0, 0, 0.8);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+
+    text-transform: uppercase;
+    letter-spacing: 2px;
 }
 
+
 .btn-primary:hover {
-    color: var(--accent);
-    border: 1px solid var(--accent);
-    box-shadow: 0 0 5px var(--glow-shadow), 0 0 10px var(--glow-shadow), 0 0 15px rgba(0, 255, 0, 0.1), inset 0 2px 0 black;
+    background: rgba(0,255,100,0.1);
+    box-shadow: 0 0 15px rgba(0,255,100,0.4);
 }
 
 /* Resultados Adaptados al modo oscuro */
 .results-area { margin-top: 25px; display: flex; flex-direction: column; gap: 10px; }
-.caja-resultado { padding: 15px; border-radius: 5px; font-weight: bold; border: 1px solid var(--border-input); background: var(--bg-panels); }
+
+.caja-resultado {
+    padding: 15px;
+    border-radius: 6px;
+    font-weight: bold;
+
+    background: rgba(27, 27, 27, 0.5);
+    backdrop-filter: blur(10px);
+
+    border: 1px solid var(--glass-border);
+}
+
 .aleatorio { border-left: 5px solid var(--accent); color: var(--text-main); }
 .estadistica { border-left: 5px solid #3498db; color: var(--text-main); }
 .error { border-left: 5px solid #e74c3c; color: var(--text-main); }
@@ -281,4 +490,173 @@ body {
 
 .pantalla-activa {
     display: block !important; /* O 'flex' si prefieres ese diseño */
+}
+
+/* --- BASE LIQUID GLASS --- */
+.glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    box-shadow: 
+        inset 0 1px 1px var(--glass-highlight),
+        0 8px 20px rgba(0,0,0,0.4);
+}
+
+/* Reflejo superior tipo cristal */
+.glass::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+        120deg,
+        rgba(255,255,255,0.08),
+        transparent 40%
+    );
+    pointer-events: none;
+}
+
+.glass-panel {
+    background: rgba(27, 27, 27, 0.5);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: 6px;
+}
+
+
+
+.bg-effects {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+
+    background: #151515;
+}
+
+.bg-effects::before,
+.bg-effects::after {
+    content: "";
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.25;
+}
+
+/* Mancha verde 1 */
+.bg-effects::before {
+    background: #00ff88;
+    top: 10%;
+    left: 10%;
+    animation: float1 12s infinite ease-in-out;
+}
+
+/* Mancha verde 2 */
+.bg-effects::after {
+    background: #00cc66;
+    bottom: 10%;
+    right: 10%;
+    animation: float2 14s infinite ease-in-out;
+}
+
+@keyframes float1 {
+    0%, 100% { transform: translate(0,0); }
+    50% { transform: translate(80px, 40px); }
+}
+
+@keyframes float2 {
+    0%, 100% { transform: translate(0,0); }
+    50% { transform: translate(-60px, -30px); }
+}
+
+.hud-label {
+    position: absolute;
+    top: -18px;
+    left: 12px;
+
+    font-size: 0.65rem;
+    color: var(--accent);
+    opacity: 0.7;
+
+    font-family: 'Share Tech Mono', monospace;
+    letter-spacing: 1px;
+}
+
+.results-panel {
+    margin-top: 25px;
+    padding: 15px;
+
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+
+    background: rgba(0, 20, 0, 0.4);
+    backdrop-filter: blur(12px);
+
+    border: 1px solid var(--hud-line);
+    border-radius: 2px;
+
+    position: relative;
+}
+
+.resultado-box {
+    flex: 1;
+    min-width: 180px;
+
+    padding: 15px;
+
+    background: rgba(0, 0, 0, 0.6);
+
+    border: 1px solid var(--hud-line);
+    border-radius: 2px;
+
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.resultado-label {
+    font-size: 0.7rem;
+    color: var(--hud-line);
+
+    text-transform: uppercase;
+    letter-spacing: 1px;
+
+    margin-bottom: 8px;
+}
+
+.resultado-valor {
+    font-size: 2.8rem;
+    font-weight: bold;
+    font-family: 'Share Tech Mono', monospace;
+}
+
+/* Verde - tirada */
+.resultado-aleatorio .resultado-valor {
+    color: var(--accent);
+    text-shadow: 0 0 10px rgba(0,255,100,0.6);
+}
+
+/* Azul - media */
+.resultado-estadistico .resultado-valor {
+    color: #3498db;
+    text-shadow: 0 0 10px rgba(52,152,219,0.6);
+}
+
+.resultado-box::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    width: 40px;
+    height: 2px;
+
+    background: var(--accent);
 }

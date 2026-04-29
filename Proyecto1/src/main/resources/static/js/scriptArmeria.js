@@ -36,7 +36,7 @@ async function cargarTarjetasUnidad() {
 
         // Dibujar las tarjetas dinámicamente PASANDO SOLO EL ID
         contenedor.innerHTML = tarjetas.map(t => `
-            <div class="tarjeta-unidad" style="background: var(--bg-panels); border: 1px solid var(--border-dark); padding: 15px; border-radius: 5px; cursor: pointer; transition: 0.3s;" 
+            <div class="tarjeta-unidad glass-panel">
                  onclick="prepararEquiparUnidad(${t.id})"
                  onmouseover="this.style.borderColor='var(--accent)'" 
                  onmouseout="this.style.borderColor='var(--border-dark)'">
