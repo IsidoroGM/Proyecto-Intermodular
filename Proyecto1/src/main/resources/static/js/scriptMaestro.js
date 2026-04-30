@@ -185,14 +185,14 @@ function activarEfectoCambioPantalla() {
     }, 500);
 }
 
-// Sonido de terminal para mejorar la experiencia al cambiar de pantalla o simular un ataque.
+
 function reproducirSonidoTerminal() {
     const audio = new Audio('/sounds/750435__rescopicsound__ui-click-menu-modern-interface-select-small-01.mp3');
     audio.volume = 0.3;
 
-    audio.play()
-        .then(() => console.log("🔊 Sonido reproducido"))
-        .catch(error => console.error("❌ Error al reproducir sonido:", error));
+    audio.play().catch(() => {
+        // Silenciamos el error para que no ensucie la consola durante desarrollo
+    });
 }
 
 // Integración con el menú móvil (Paso 19)
