@@ -107,10 +107,10 @@
 
 		<!-- H2 Console es una herramienta web que permite interactuar con la base de datos H2 a través de un navegador. Proporciona una interfaz gráfica para ejecutar consultas SQL, administrar tablas y visualizar datos.
 		 Fuente: https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-h2console -->
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-h2console</artifactId>
-		</dependency>
+		</dependency> -->
 
 		<dependency>
             <groupId>io.jsonwebtoken</groupId>

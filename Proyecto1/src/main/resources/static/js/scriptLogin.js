@@ -1,6 +1,6 @@
 // --- VARIABLES GLOBALES DE USUARIO ---
 let usuarioActual = null; 
-const API_BASE = "http://localhost:8080/api"; 
+const API_BASE = "/api";
 
 // 1. Alternar entre Login y Registro
 let modoRegistro = false;
